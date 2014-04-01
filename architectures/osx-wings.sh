@@ -19,22 +19,9 @@ export USE_PROXY=0
 VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 PYTHON_POSTFIX=/bin/python
 
-export ADVICE_PROJECT_ROOT=/Users/indika/links/dev/qsuper
-export ADVICE_FACTORY_ROOT=${ADVICE_PROJECT_ROOT}/advice-trunk
-export ADVICE_INTROSPECTION_ROOT=${ADVICE_PROJECT_ROOT}/advice-introspection
-export ADVICE_DOC_ROOT=${ADVICE_PROJECT_ROOT}/advice-docs
-export ADVICE_META_ROOT=${ADVICE_PROJECT_ROOT}/advice-meta
-
-export ADVICE_SDRIVE_BACKUP_ROOT=/dev/null
-export ADVICE_ARTIFACTS=/Users/indika/links/dev/qsuper/artifacts
-
-export COOKIE_JAR=/Users/indika/links/dev/qsuper/advice-introspection/components/extensions/requests/cookies.txt
 export CODE_LIBRARY=/Users/indika/dev/library/code-library
 
 
-alias advice='${VIRTUALENV_ROOT}/advice-introspection${PYTHON_POSTFIX} ${ADVICE_PROJECT_ROOT}/advice-introspection/advice.py'
-alias introspect='source ${VIRTUALENV_ROOT}/advice-introspection/bin/activate;cd ${ADVICE_PROJECT_ROOT}/advice-introspection'
-alias qsuper='cd /Users/indika/links/dev/qsuper'
 alias pycharm30='cd /Users/indika/Library/Preferences/PyCharm30'
 alias system_test='sh /Users/indika/dev/hydra/system_tests/test_all.sh'
 
@@ -69,18 +56,6 @@ function advice_push()
     git pull bucket master
     git push bucket master
 
-    cd ${ADVICE_INTROSPECTION_ROOT}
-    git status
-    git commit -a -m 'autocommit'
-    git pull assembla master
-    git push assembla master
-
-    cd $ADVICE_DOC_ROOT
-    git status
-    git commit -a -m 'autocommit'
-    git pull bucket master
-    git push bucket master
-
     cd ${CODE_LIBRARY}
     git status
     git commit -a -m 'autocommit'
@@ -101,14 +76,6 @@ function advice_pull()
     git pull bucket master
 
     cd /Users/indika/dev/instance/django_instance
-    git status
-    git pull bucket master
-
-    cd ${ADVICE_INTROSPECTION_ROOT}
-    git status
-    git pull assembla master
-
-    cd $ADVICE_DOC_ROOT
     git status
     git pull bucket master
 
@@ -185,18 +152,13 @@ function bus() {
             --pretty=format:"%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s"
 }
 
-function qsuper() {
-    cd /Users/indika/links/dev/qsuper
-    st advice-docs advice-meta
-}
-
 function blog() {
     printf "Updating the blog"
     # 2014-01-11
-    st $CODE_LIBRARY/Blog/_posts/2014-01-11-cooking-with-chef.md
+    st $CODE_LIBRARY/Blog/_posts/*.md
     cd /Users/indika/links/dev/ninjacircles/ninjacircles/_posts
-    rm 2014-01-11-cooking-with-chef.md
-    cp /Users/indika/Plasma/Dev/library/code-library/Blog/_posts/2014-01-11-cooking-with-chef.md .
+    rm *.md
+    cp $CODE_LIBRARY/Blog/_posts/*.md .
     git commit -a -m 'updating the blog'
     git push stable scribble
     git push hub scribble
