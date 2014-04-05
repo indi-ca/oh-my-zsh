@@ -20,9 +20,10 @@ VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 PYTHON_POSTFIX=/bin/python
 
 export CODE_LIBRARY=/Users/indika/dev/library/code-library
+export CONFIG_PYCHARM='/Users/indika/Library/Preferences/PyCharm30'
+export CONFIG_SUBLIME='/Users/indika/Library/Application Support/Sublime Text 3/Packages/User'
 
 
-alias pycharm30='cd /Users/indika/Library/Preferences/PyCharm30'
 alias system_test='sh /Users/indika/dev/hydra/system_tests/test_all.sh'
 
 alias cookies='st $COOKIE_JAR'
