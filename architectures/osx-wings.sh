@@ -19,7 +19,9 @@ export USE_PROXY=0
 VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 PYTHON_POSTFIX=/bin/python
 
-export CODE_LIBRARY=/Users/indika/dev/library/code-library
+export DRIVE="/Users/indika/Plasma/Google Drive"
+export DROPBOX="/Users/indika/Dropbox"
+export CODE_LIBRARY=${DROPBOX}/code_library
 export CONFIG_PYCHARM='/Users/indika/Library/Preferences/PyCharm30'
 export CONFIG_SUBLIME='/Users/indika/Library/Application Support/Sublime Text 3/Packages/User'
 
@@ -191,14 +193,20 @@ function haskell()
     printf "Open a new browser window"
     pause
     cd /Users/indika/dev/functional
-    st /Users/indika/Plasma/Dev/library/code-library/Haskell /Users/indika/dev/library/code-library/Projects/Euler .
-    open http://learnyouahaskell.com/chapters https://projecteuler.net/problems
+    st $CODE_LIBRARY/Haskell /Users/indika/dev/library/code-library/Projects/Euler .
+    open http://learnyouahaskell.com/chapters https://projecteuler.net/problems http://www.seas.upenn.edu/~cis194/lectures.html
 }
 
-function fp()
+function play_fp()
 {
     # runhaskell /Users/indika/dev/library/code-library/Projects/Euler/problem_3/prime.hs
     runhaskell /Users/indika/Plasma/Dev/functional/explore/play.hs
+}
+
+function yorgey()
+{
+    # runhaskell /Users/indika/dev/library/code-library/Projects/Euler/problem_3/prime.hs
+    runhaskell /Users/indika/Plasma/Dev/functional/yorgey/week_one/cards.hs
 }
 
 function machine_learning()

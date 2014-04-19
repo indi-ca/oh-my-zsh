@@ -11,12 +11,15 @@ export BOX_SAFECHAT=/Users/indika/dev/box/safechat
 
 # Generic Stuff
 
-SUBLIME_HOME_USER='/Users/indika/Library/Application Support/Sublime Text 3/Packages/User'
-PYCHARM_CONFIG_HOME='/Users/indika/Library/Preferences/PyCharm30'
+export CONFIG_SUBLIME='/Users/indika/Library/Application Support/Sublime Text 3/Packages/User'
+export CONFIG_PYCHARM='/Users/indika/Library/Preferences/PyCharm30'
+export DROPBOX="/Users/indika/Dropbox"
+export CODE_LIBRARY=${DROPBOX}/code_library
+
 
 VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 
-# export CODE_LIBRARY=/Users/indika/dev/library/code-library
+
 
 alias st='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
 alias getpath='pwd | pbcopy'
