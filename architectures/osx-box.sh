@@ -61,9 +61,21 @@ function fetch_cache()
 
 function sync_cobalt()
 {
-    printf "Updating repositories in Cobalt\n"
+    printf "Syncing repositories in Cobalt\n"
 
-    printf "Updating Boxen\n"
+    printf "Syncing OH MY ZSH\n"
+    cd /Users/indika/.oh-my-zsh
+    git commit -m 'autocommit'
+    git pull origin master
+    git push origin master
+
+    printf "Syncing Boxen\n"
+    cd /opt/boxen/my-boxen
+    git commit -m 'autocommit'
+    git pull origin master
+    git push origin master
+
+    printf "Syncing Sublime\n"
     cd /opt/boxen/my-boxen
     git commit -m 'autocommit'
     git pull origin master
