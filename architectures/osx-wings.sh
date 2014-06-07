@@ -31,6 +31,7 @@ alias system_test='sh /Users/indika/dev/hydra/system_tests/test_all.sh'
 alias cookies='st $COOKIE_JAR'
 
 
+alias box_docs='st /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs'
 
 
 
@@ -40,52 +41,40 @@ USER_AGENT_FIREFOX="User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:21.0) Gec
 export USER_AGENT=${USER_AGENT_CHROME}
 
 
-function advice_push()
+function ad()
 {
-    printf "Pushing all repositories\n"
+    ag -B 0 -C 3 $1 /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs
+}
 
-    echo ${PWD}
-    CURRENT_PATH=${PWD}
 
-    cd /Users/indika/Library/Preferences/PyCharm30
-    git status
-    git pull origin master
-    git pull bucket master
-    git push origin master
-    git push bucket master
+function sync_cobalt()
+{
+    printf "Pulling repositories from Cobalt\n"
 
-    cd /Users/indika/dev/instance/django_instance
-    git status
-    git pull bucket master
-    git push bucket master
-
-    cd ${CODE_LIBRARY}
-    git status
+    cd /Users/indika/dev/box/docs
     git commit -a -m 'autocommit'
-    git pull bucket master
-    git push bucket master
+    git pull cobalt master
+    git push cobalt master
+
+    cd /Users/indika/dev/box/helper
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
+
+    cd /Users/indika/dev/box/templates
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
+
+    cd /Users/indika/dev/box/templates
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 }
 
-function advice_pull()
-{
-    printf "Pulling all repositories\n"
 
-    echo ${PWD}
-    CURRENT_PATH=${PWD}
 
-    cd /Users/indika/Library/Preferences/PyCharm30
-    git status
-    git pull origin master
-    git pull bucket master
 
-    cd /Users/indika/dev/instance/django_instance
-    git status
-    git pull bucket master
-
-    cd ${CODE_LIBRARY}
-    git status
-    git pull bucket master
-}
 
 
 function instance ()
@@ -99,8 +88,8 @@ function instance ()
     fi
 
     touch $1
-    cat /Users/indika/links/drive/store/library/Python/python.template.class.commandline.txt >> $1
-    s -n $1 /Users/indika/links/drive/store/library/Python/python.template.class.commandline.txt
+    cat $CODE_LIBRARY/Python/python.template.class.commandline.txt >> $1
+    s -n $1 $CODE_LIBRARY/Python/python.template.class.commandline.txt
 }
 
 function search_anki()
@@ -193,8 +182,8 @@ function haskell()
     printf "Open a new browser window"
     pause
     cd /Users/indika/dev/functional
-    st $CODE_LIBRARY/Haskell /Users/indika/dev/library/code-library/Projects/Euler .
-    open http://learnyouahaskell.com/chapters https://projecteuler.net/problems http://www.seas.upenn.edu/~cis194/lectures.html
+    st $CODE_LIBRARY/Haskell $CODE_LIBRARY/Projects/Euler .
+    open http://learnyouahaskell.com/higher-order-functions#higher-orderism https://projecteuler.net/problems http://www.seas.upenn.edu/~cis194/lectures.html https://hackage.haskell.org/package/base http://www.haskell.org/hoogle/ http://holumbus.fh-wedel.de/hayoo/hayoo.html
 }
 
 function play_fp()
@@ -231,6 +220,11 @@ function convert_flac_to_mp3()
     fi
 
     done
+}
+
+function run_last_command()
+{
+    echo !!
 }
 
 
