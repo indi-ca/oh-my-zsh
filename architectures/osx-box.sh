@@ -47,6 +47,8 @@ alias twitter='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter'
 
 alias pass='pwgen -y 16'
 
+alias rmpyc='find . -name "*.pyc" -exec rm -rf {} \;'
+alias rmlog='find . -name "*.log" -exec rm -rf {} \;'
 
 alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional'
 # alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync /Users/indika/dev/box/netbox/winrip /Users/indika/dev/box/netbox/winripclient $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper'
@@ -63,6 +65,14 @@ alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -
 
 # Lync 2010 User on my box
 alias lync_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u user3 -d nbbdev2008 -p Oxcoda99 10.12.10.160'
+
+
+function ad()
+{
+    ag -C5 $1 $CODE_LIBRARY
+}
+
+
 
 function flush_redis()
 {
@@ -125,14 +135,15 @@ function test_lego()
 function facebook()
 {
     printf "Facebook\n"
-    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook/test
+    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook
 }
 
 function test_facebook()
 {
     printf "Facebook is being AUPed\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook
-    TARGET_FILE=test_chunks.py
+    # TARGET_FILE=test_chunks.py
+    TARGET_FILE=test_comments.py
 
     printf "TESTING: %s" % $TARGET_FILE
 
@@ -266,15 +277,18 @@ function failing_tests()
 
 function test_twitter()
 {
-    printf "All files are being AUPed\n"
+    printf "Twitter and Test is being AUPed\n"
+
+    TARGET_FILE=test_sent_direct_message.py
+    # TARGET_FILE=test_direct_messages_json.py
 
     # TARGET_FILE=test_sent_direct_message.py
     # TARGET_FILE=test_direct_message.py
     # TARGET_FILE=test_single_tweet.py
-    TARGET_FILE=test_direct_messages_json.py
     # TARGET_FILE=test_single_tweet_html.py
 
-    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/test
     rununittest lego -n -t '-xvs' $TARGET_FILE 2>&1 | tee $TARGET_FILE.log
     cat $TARGET_FILE.log | ag 'Fetching'
     cat $TARGET_FILE.log | ag 'indika'
@@ -402,6 +416,10 @@ function fetch_icaps()
     cp /Users/indika/temp/icaps/*.request $CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter/test/data/icap
     # cp /Users/indika/temp/icaps/*.request $CURRENT_PROJECT/nbwebscan/src/nbwebscan/yahoo/messenger/test/data/icap
     # st /Users/indika/temp/icaps
+
+    # Now parse them
+    /Users/indika/.virtualenvs/safechat/bin/python /Users/indika/dev/box/helper/icap_inspector/data/icaps/icap_plain_text.py --dir /Users/indika/temp/icaps
+
 }
 
 function fetch_cache()
@@ -422,29 +440,34 @@ function clear_cache()
 
 function sync_cobalt()
 {
-    printf "Syncing repositories in Cobalt\n"
+    printf "Syncing Box Notes\n"
+    cd /Users/indika/dev/box/docs
+    git add *
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 
     printf "Syncing OH MY ZSH\n"
     cd /Users/indika/.oh-my-zsh
-    git commit -m 'autocommit'
-    git pull origin master
-    git push origin master
+    git commit -a -m 'autocommit'
+    git pull hub master
+    git push hub master
 
     printf "Syncing Boxen\n"
     cd /opt/boxen/my-boxen
-    git commit -m 'autocommit'
+    git commit -a -m 'autocommit'
     git pull origin master
     git push origin master
 
     printf "Syncing Sublime\n"
     cd $CONFIG_SUBLIME
-    git commit -m 'autocommit'
+    git commit -a -m 'autocommit'
     git pull origin master
     git push origin master
 
     printf "tweaking\n"
     cd '/Users/indika/Library/Application Support/Sublime Text 3/Packages/SublimePushBullet'
-    git commit -m 'autocommit'
+    git commit -a -m 'autocommit'
     git pull origin master
     git push origin master
 
