@@ -26,9 +26,17 @@ VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 # WORKON=archiving
 
 
-WORKON=facebook
+# WORKON=lync_archiving
+# WORKON=facebook
 
+# WORKON=twitter_threadids
 # WORKON=twitter_dynamic
+
+
+# This is about scanning the groups
+WORKON=linkedin_all
+
+# WORKON=default
 
 
 
@@ -67,9 +75,25 @@ alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -
 alias lync_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u user3 -d nbbdev2008 -p Oxcoda99 10.12.10.160'
 
 
+# finish up, wrap up, close, shutdown
+function wrap_up()
+{
+    cd $BOX_DOCS
+    git status
+}
+
+
+function last_command()
+{
+    var=`tail -2 ~/.zsh_history | head -1`
+    echo $var | grep -oE ';(.*)' | cut -c 2- | pbcopy
+}
+
+
+
 function ad()
 {
-    ag -C5 $1 $CODE_LIBRARY
+    ag -C5 $1 $CODE_LIBRARY $BOX_DOCS
 }
 
 
@@ -112,7 +136,7 @@ function test_on_lego()
 {
     printf "All files (src/nbwebscan/) are being AUPed\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
-    rununittest lego -n -t '-xvs' $1 2>&1 | tee $1.log
+    rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
     ag -B 1 -A 3 'FAIL' $1.log
@@ -122,7 +146,7 @@ function test_on_lego()
 
 }
 
-function test_lego()
+function test_twitter_lego()
 {
     printf "Twitter Testing on Lego\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
@@ -131,19 +155,49 @@ function test_lego()
     test_on_lego test_sent_direct_message.py
 }
 
-
 function facebook()
 {
     printf "Facebook\n"
     cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook
 }
 
-function test_facebook()
+
+function facebook_protocol_handlers()
+{
+    ag "r\'\^http.*?\'" $CURRENT_PROJECT -G py
+}
+
+function test_facebook_comments()
 {
     printf "Facebook is being AUPed\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook
+
+    rmlog
+
+    for TARGET_FILE in test_comment_decoding.py test_comment_send.py test_comment_send_nested.py test_comment_xhr.py test_json_comments.py test_spam_comment.py test_view_comment_decoding.py test_view_html_comments.py
+    do
+        printf "TESTING: %s" % $TARGET_FILE
+        rununittest lego -n -t '-vs' $TARGET_FILE 2>&1 | tee $TARGET_FILE.log
+    done
+
+    for TARGET_FILE in *.log
+    do
+        ag -B 1 -A 3 'indika' $TARGET_FILE
+        ag -B 1 -A 3 'FAIL' $TARGET_FILE
+        ag -B 1 -A 3 'passed' $TARGET_FILE
+
+        printf "TESTING: %s" % $TARGET_FILE
+    done
+}
+
+function test_facebook()
+{
+    printf "NBWebscan is being AUPed\n"
+    aup -r lego $CURRENT_PROJECT
+
     # TARGET_FILE=test_chunks.py
-    TARGET_FILE=test_comments.py
+    # TARGET_FILE=test_comments.py
+    TARGET_FILE=test_json_comments.py
 
     printf "TESTING: %s" % $TARGET_FILE
 
@@ -236,7 +290,9 @@ function test_linkedin()
     # TARGET_FILE=test_group_read_discussion.py
 
     # Having trouble testing the spoofed case
-    TARGET_FILE=test_create_group.py
+    # TARGET_FILE=test_create_group.py
+    # TARGET_FILE=test_group_search_all_discussions.py
+    TARGET_FILE=test_groups_summary.py
 
     # This test has always failed
     # TARGET_FILE=test_messages_read_message.py
@@ -425,7 +481,7 @@ function fetch_icaps()
 function fetch_cache()
 {
     printf "Re-Fetching Debug cache from Lego\n"
-    cd rm -rf /Users/indika/temp
+    cd ~
     rm -rf /Users/indika/temp/debug_cache
     sc -r lego:/tmp/debug_cache /Users/indika/temp/debug_cache
 
@@ -470,7 +526,6 @@ function sync_cobalt()
     git commit -a -m 'autocommit'
     git pull origin master
     git push origin master
-
 }
 
 
