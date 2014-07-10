@@ -34,7 +34,14 @@ VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 
 
 # This is about scanning the groups
-WORKON=linkedin_all
+# WORKON=linkedin_all
+
+
+# This is about multi-tenant support
+WORKON=tenant
+
+
+
 
 # WORKON=default
 
@@ -44,7 +51,9 @@ CURRENT_PROJECT=/Users/indika/dev/box/safechat_$WORKON
 
 
 alias st='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
-alias getpath='pwd | pbcopy'
+alias getpath="pwd | tr -d '\n' | pbcopy"
+
+alias hgbii='hg branches | grep ipiyasena'
 
 
 alias nbwebscan='$CURRENT_PROJECT/nbwebscan/src/nbwebscan'
@@ -80,8 +89,17 @@ function wrap_up()
 {
     cd $BOX_DOCS
     git status
+
+    printf "-> Delete a snapshot\n"
+    printf "Remember to see what is for later in box.next\n"
 }
 
+
+function twisted()
+{
+    cd /Users/indika/dev/twisted/twisted-intro
+
+}
 
 function last_command()
 {
@@ -143,6 +161,16 @@ function test_on_lego()
     ag -B 1 -A 3 'passed' $1.log
 
     printf "TESTING: %s" % $1
+
+}
+
+function test_multi_tenant_lego()
+{
+    printf "Twitter MultiTenant on Lego\n"
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/test
+    test_on_lego test_multi_tenant_config.py
 
 }
 
@@ -291,8 +319,8 @@ function test_linkedin()
 
     # Having trouble testing the spoofed case
     # TARGET_FILE=test_create_group.py
-    # TARGET_FILE=test_group_search_all_discussions.py
-    TARGET_FILE=test_groups_summary.py
+    TARGET_FILE=test_group_search_all_discussions.py
+    # TARGET_FILE=test_groups_summary.py
 
     # This test has always failed
     # TARGET_FILE=test_messages_read_message.py
