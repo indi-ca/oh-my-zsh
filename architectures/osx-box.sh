@@ -33,18 +33,19 @@ VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 # WORKON=twitter_dynamic
 
 
+# LINKEDIN
 # This is about scanning the groups
 # WORKON=linkedin_all
+WORKON=linkedin_unit
 
 
 # This is about multi-tenant support
-WORKON=tenant
+# WORKON=tenant
 
 
 
-
+# THIS IS DEFAULT
 # WORKON=default
-
 
 
 CURRENT_PROJECT=/Users/indika/dev/box/safechat_$WORKON
@@ -67,7 +68,7 @@ alias pass='pwgen -y 16'
 alias rmpyc='find . -name "*.pyc" -exec rm -rf {} \;'
 alias rmlog='find . -name "*.log" -exec rm -rf {} \;'
 
-alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional'
+alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper'
 # alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync /Users/indika/dev/box/netbox/winrip /Users/indika/dev/box/netbox/winripclient $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper'
 alias hgb="hg branches | sort | grep 'ipiyasena'"
 alias icap_spector="/Users/indika/.virtualenvs/safechat/bin/python $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper/icap_spector/icap_spector.py"
@@ -84,21 +85,35 @@ alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -
 alias lync_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u user3 -d nbbdev2008 -p Oxcoda99 10.12.10.160'
 
 
+alias buildnb='ss ipiyasena@build.nb'
+alias oinknew='ss ipiyasena@oink-new.nb'
+alias isix='ss root@10.4.10.194'
+
+
+function aupr()
+{
+    printf "-> Recursive AUP to Lego and Squid Restart\n"
+    aup -r lego .
+    ss lego '/etc/init.d/safechat_icap restart'
+}
+
+
 # finish up, wrap up, close, shutdown
-function wrap_up()
+function wrapup()
 {
     cd $BOX_DOCS
     git status
 
     printf "-> Delete a snapshot\n"
+    printf "-> Leftovers in refridgerator\n"
     printf "Remember to see what is for later in box.next\n"
 }
 
 
 function twisted()
 {
-    cd /Users/indika/dev/twisted/twisted-intro
-
+    cd /Users/indika/dev/learn/twisted/twisted-intro
+    st -n /Users/indika/dev/learn/twisted/twisted-intro
 }
 
 function last_command()
@@ -150,11 +165,45 @@ function unapply_session.py()
 }
 
 
+function test_multi_tenant_isix()
+{
+    printf "Uploading the latest JSON schema\n"
+    sc ~/dev/box/netbox/cloudconfig/schemas/multitenant-schema.json root@10.4.10.194:/usr/share/nbb/schemas/multitenant-schema.json
+
+    printf "All files (src/nbwebscan/) are being AUPed to LEGO\n"
+    aup -r 10.4.10.194 $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/test
+
+    # rununittest 10.4.10.194 -c -t '-xsk test_nbbdev_tenant' test_multitenant.py
+    # rununittest 10.4.10.194 -c  test_multitenant.py
+    # rununittest 10.4.10.194 -n -t '-xvs --report=skipped' test_multitenant.py
+    rununittest 10.4.10.194 -n -t '-xvs' test_multitenant.py 2>&1 | tee test_multitenant.py.log
+
+    ag -B 1 -A 3 'indika' test_multitenant.py.log
+    ag -B 1 -A 3 'FAIL' test_multitenant.py.log
+    ag -B 1 -A 3 'passed' test_multitenant.py.log
+}
+
+
 function test_on_lego()
 {
-    printf "All files (src/nbwebscan/) are being AUPed\n"
+    printf "All files (src/nbwebscan/) are being AUPed to LEGO\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
     rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+
+    ag -B 1 -A 3 'indika' $1.log
+    ag -B 1 -A 3 'FAIL' $1.log
+    ag -B 1 -A 3 'passed' $1.log
+
+    printf "TESTING: %s" % $1
+}
+
+
+function test_on_isix()
+{
+    printf "All files (src/nbwebscan/) are being AUPed to ISIX\n"
+    aup -r isix $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    rununittest isix -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
     ag -B 1 -A 3 'FAIL' $1.log
@@ -164,15 +213,6 @@ function test_on_lego()
 
 }
 
-function test_multi_tenant_lego()
-{
-    printf "Twitter MultiTenant on Lego\n"
-    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
-
-    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/test
-    test_on_lego test_multi_tenant_config.py
-
-}
 
 function test_twitter_lego()
 {
@@ -336,6 +376,16 @@ function test_linkedin()
     # cat test_create_group.py.log | ag 'indika'
 
     printf "TESTING: %s" % $TARGET_FILE
+}
+
+
+
+function test_linkedin_broken()
+{
+    printf "All files are being AUPed\n"
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+    TARGET_FILE=test_group_search_all_discussions.py
 }
 
 
@@ -513,7 +563,7 @@ function fetch_cache()
     rm -rf /Users/indika/temp/debug_cache
     sc -r lego:/tmp/debug_cache /Users/indika/temp/debug_cache
 
-    cd /Users/indika/temp/debug_cache
+    # cd /Users/indika/temp/debug_cache
 }
 
 function clear_cache()
