@@ -87,6 +87,7 @@ alias lync_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u user3 -d nbbdev2
 
 alias buildnb='ss ipiyasena@build.nb'
 alias oinknew='ss ipiyasena@oink-new.nb'
+alias six= echo '10.4.10.194' | pbcopy
 alias isix='ss root@10.4.10.194'
 
 
@@ -184,6 +185,32 @@ function test_multi_tenant_isix()
     ag -B 1 -A 3 'passed' test_multitenant.py.log
 }
 
+function test_bb_transcripts()
+{
+    printf "Uploading the latest JSON schema\n"
+
+    SCHEMA=/Users/indika/dev/box/netbox/cloudcte/schemas/vault-transcripts.xsd
+    SAMPLE=/Users/indika/dev/box/netbox/cloudcte/src/cloudcte/test/bvault_transcript_schema_SM_sample.xml
+
+    printf "Locally linting\n"
+    xmllint --noout --schema $SCHEMA $SAMPLE
+    printf "Done locally linting\n\n\n\n"
+
+    sc $SCHEMA root@10.4.10.194:/usr/share/nbb/schemas/vault-transcripts.xsd
+    sc $SAMPLE root@10.4.10.194:/usr/share/nbb/schemas/vault-transcripts_sample.xml
+
+
+
+    printf "CTE is being AUPed to LEGO\n"
+    aup -r 10.4.10.194 /Users/indika/dev/box/netbox/cloudcte/src/cloudcte
+    cd /Users/indika/dev/box/netbox/cloudcte/src/cloudcte/test
+
+    rununittest 10.4.10.194 -n -t '-xvs --report=skipped' test_transcripts.py 2>&1 | tee test_transcripts.py.log
+    ag -B 1 -A 3 'indika' test_transcripts.py.log
+    ag -B 1 -A 3 'FAIL' test_transcripts.py.log
+    ag -B 1 -A 3 'passed' test_transcripts.py.log
+}
+
 
 function test_on_lego()
 {
@@ -202,8 +229,8 @@ function test_on_lego()
 function test_on_isix()
 {
     printf "All files (src/nbwebscan/) are being AUPed to ISIX\n"
-    aup -r isix $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
-    rununittest isix -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    aup -r 10.4.10.194 $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    rununittest 10.4.10.194 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
     ag -B 1 -A 3 'FAIL' $1.log
@@ -483,9 +510,6 @@ function test_all_twitter()
 
 function test_all_linkedin()
 {
-
-    $CURRENT_PROJECT = '/Users/indika/dev/box/safechat_link_subgroups'
-
     printf "All files are being AUPed\n"
     aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
 
@@ -522,6 +546,12 @@ function update_lego()
     ss lego 'supervisorctl restart safechat:safechat-icap'
 
     # cd /Users/indika/dev/box/safechat/nbwebscan/src/nbwebscan/twitter/test
+}
+
+function update_isix()
+{
+    printf "Updating ISIX Recursively from here\n"
+    aup -r 10.4.10.194 .
 }
 
 function fetch()
