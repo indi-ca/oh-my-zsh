@@ -27,7 +27,7 @@ export CONFIG_SUBLIME='/Users/indika/Library/Application Support/Sublime Text 3/
 
 
 alias system_test='sh /Users/indika/dev/hydra/system_tests/test_all.sh'
-
+alias rhythm='/Users/indika/.virtualenvs/rhythms/bin/python /Users/indika/dev/rhythms/explore/create.py'
 alias cookies='st $COOKIE_JAR'
 
 
@@ -40,10 +40,10 @@ USER_AGENT_CHROME="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) Ap
 USER_AGENT_FIREFOX="User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0"
 export USER_AGENT=${USER_AGENT_CHROME}
 
-
+# Searches using ag
 function ad()
 {
-    ag -B 0 -C 3 $1 /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs
+    ag -A3 -B1 $1 $CODE_LIBRARY /Volumes/MacFuse /Users/indika/dev/box/docs $DRIVE/store
 }
 
 
@@ -70,6 +70,11 @@ function sync_cobalt()
     git commit -a -m 'autocommit'
     git pull cobalt master
     git push cobalt master
+
+    cd /Users/indika/dev/box/icap_test
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 }
 
 
@@ -92,10 +97,6 @@ function instance ()
     s -n $1 $CODE_LIBRARY/Python/python.template.class.commandline.txt
 }
 
-function search_anki()
-{
-    /Users/indika/scripts/wings/search_anki.sh $1
-}
 
 
 function django_instance() {
@@ -183,7 +184,12 @@ function haskell()
     pause
     cd /Users/indika/dev/functional
     st $CODE_LIBRARY/Haskell $CODE_LIBRARY/Projects/Euler .
-    open http://learnyouahaskell.com/higher-order-functions#higher-orderism https://projecteuler.net/problems http://www.seas.upenn.edu/~cis194/lectures.html https://hackage.haskell.org/package/base http://www.haskell.org/hoogle/ http://holumbus.fh-wedel.de/hayoo/hayoo.html
+    open http://learnyouahaskell.com/higher-order-functions#higher-orderism http://www.haskell.org/haskellwiki/Typeclassopedia http://www.seas.upenn.edu/~cis194/lectures.html http://www.haskell.org/ghc/docs/latest/html/libraries/base/Data-Monoid.html http://book.realworldhaskell.org/read/writing-a-library-working-with-json-data.html
+    # https://hackage.haskell.org/package/base
+    # https://projecteuler.net/problems
+    # http://www.haskell.org/haskellwiki/Typeclassopedia
+    #
+    # http://www.haskell.org/hoogle/ http://holumbus.fh-wedel.de/hayoo/hayoo.html
 }
 
 function play_fp()
