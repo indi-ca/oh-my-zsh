@@ -46,6 +46,30 @@ function ad()
     ag -A3 -B1 $1 $CODE_LIBRARY /Volumes/MacFuse /Users/indika/dev/box/docs $DRIVE/store
 }
 
+function hd()
+{
+    /Users/indika/.virtualenvs/fibres/bin/python /Users/indika/dev/sandbox/sandbox/command_line/screen.py
+    # clear
+}
+
+function hdserver()
+{
+    cd /Users/indika/dev/functional/explore/json
+    python respawn.py
+}
+
+
+function synergy_wings()
+{
+    cd /Users/indika/dev/opensource/synergy/synergy-1.5.1-Source/bin/debug
+    ./synergys --config /Users/indika/Dropbox/code_library/Tools/Synergy/synergy.wings.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+}
+
+function synergy_build()
+{
+    cd /Users/indika/dev/opensource/synergy/synergy-1.5.1-Source
+    ./hm.sh build -d
+}
 
 function sync_cobalt()
 {
