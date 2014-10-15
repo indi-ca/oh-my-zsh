@@ -19,7 +19,6 @@ export USE_PROXY=0
 VIRTUALENV_ROOT=/Users/indika/.virtualenvs
 PYTHON_POSTFIX=/bin/python
 
-
 export DRIVE="/Users/indika/Plasma/Google Drive"
 export DROPBOX="/Users/indika/Dropbox"
 export CODE_LIBRARY=${DROPBOX}/code_library
@@ -31,9 +30,7 @@ alias system_test='sh /Users/indika/dev/hydra/system_tests/test_all.sh'
 alias rhythm='/Users/indika/.virtualenvs/rhythms/bin/python /Users/indika/dev/rhythms/explore/create.py'
 alias cookies='st $COOKIE_JAR'
 
-
 alias box_docs='st /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs'
-
 
 
 
@@ -106,75 +103,40 @@ function sync_cobalt()
 
 
 
-
-
-
-function advice_push()
+function ad()
 {
-    printf "Pushing all repositories\n"
-
-    echo ${PWD}
-    CURRENT_PATH=${PWD}
-
-    cd /Users/indika/Library/Preferences/PyCharm30
-    git status
-    git pull origin master
-    git pull bucket master
-    git push origin master
-    git push bucket master
-
-    cd /Users/indika/dev/instance/django_instance
-    git status
-    git pull bucket master
-    git push bucket master
-
-    cd ${ADVICE_INTROSPECTION_ROOT}
-    git status
-    git commit -a -m 'autocommit'
-    git pull assembla master
-    git push assembla master
-
-    cd $ADVICE_DOC_ROOT
-    git status
-    git commit -a -m 'autocommit'
-    git pull bucket master
-    git push bucket master
-
-    cd ${CODE_LIBRARY}
-    git status
-    git commit -a -m 'autocommit'
-    git pull bucket master
-    git push bucket master
+    ag -B 0 -C 3 $1 /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs
 }
 
-function advice_pull()
+
+function sync_cobalt()
 {
-    printf "Pulling all repositories\n"
+    printf "Pulling repositories from Cobalt\n"
 
-    echo ${PWD}
-    CURRENT_PATH=${PWD}
+    cd /Users/indika/dev/box/docs
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 
-    cd /Users/indika/Library/Preferences/PyCharm30
-    git status
-    git pull origin master
-    git pull bucket master
+    cd /Users/indika/dev/box/helper
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 
-    cd /Users/indika/dev/instance/django_instance
-    git status
-    git pull bucket master
+    cd /Users/indika/dev/box/templates
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 
-    cd ${ADVICE_INTROSPECTION_ROOT}
-    git status
-    git pull assembla master
-
-    cd $ADVICE_DOC_ROOT
-    git status
-    git pull bucket master
-
-    cd ${CODE_LIBRARY}
-    git status
-    git pull bucket master
+    cd /Users/indika/dev/box/templates
+    git commit -a -m 'autocommit'
+    git pull cobalt master
+    git push cobalt master
 }
+
+
+
+
 
 
 function instance ()
@@ -245,14 +207,13 @@ function bus() {
             --pretty=format:"%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s"
 }
 
-
 function blog() {
     printf "Updating the blog"
     # 2014-01-11
-    st $CODE_LIBRARY/Blog/_posts/2014-01-11-cooking-with-chef.md
+    st $CODE_LIBRARY/Blog/_posts/*.md
     cd /Users/indika/links/dev/ninjacircles/ninjacircles/_posts
-    rm 2014-01-11-cooking-with-chef.md
-    cp /Users/indika/Plasma/Dev/library/code-library/Blog/_posts/2014-01-11-cooking-with-chef.md .
+    rm *.md
+    cp $CODE_LIBRARY/Blog/_posts/*.md .
     git commit -a -m 'updating the blog'
     git push stable scribble
     git push hub scribble
@@ -294,12 +255,6 @@ function haskell()
 }
 
 function play_fp()
-{
-    st /Users/indika/Plasma/Dev/library/code-library/Haskell /Users/indika/dev/library/code-library/Projects/Euler .
-    open http://learnyouahaskell.com/chapters https://projecteuler.net/problems
-}
-
-function fp()
 {
     # runhaskell /Users/indika/dev/library/code-library/Projects/Euler/problem_3/prime.hs
     runhaskell /Users/indika/Plasma/Dev/functional/explore/play.hs
