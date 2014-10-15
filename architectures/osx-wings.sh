@@ -294,7 +294,7 @@ function haskell()
 }
 
 function play_fp()
-
+{
     st /Users/indika/Plasma/Dev/library/code-library/Haskell /Users/indika/dev/library/code-library/Projects/Euler .
     open http://learnyouahaskell.com/chapters https://projecteuler.net/problems
 }
