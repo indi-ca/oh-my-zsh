@@ -78,8 +78,9 @@ alias twitter='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter'
 alias pass='pwgen -y 16'
 
 
-alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional'
-# alias write='st $CURRENT_PROJECT /Users/indika/dev/box/netbox/mslync /Users/indika/dev/box/netbox/winrip /Users/indika/dev/box/netbox/winripclient $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper'
+alias write='st $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp'
+
+
 alias hgb="hg branches | sort | grep 'ipiyasena'"
 alias icap_spector="/Users/indika/.virtualenvs/safechat/bin/python $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper/icap_spector/icap_spector.py"
 
@@ -135,9 +136,17 @@ function synergy_build()
     ./hm.sh build -d
 }
 
+function synergy_cobalt_server()
+{
+    cd /Users/indika/dev/opensource/synergy/bin/debug
+    ./synergys --config $CODE_LIBRARY/Tools/Synergy/synergy.cobalt.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+}
+
+
 function synergy_cobalt_client()
 {
-    /Users/indika/dev/opensource/synergy/bin/debug/synergyc -f -l /Users/indika/logs/synergy/synergy_client.log 192.168.1.54
+    # --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+    /Users/indika/dev/opensource/synergy/bin/debug/synergyc -f --crypto-pass d95026058966f0712d9a1a361ad23f92 192.168.1.54 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
 }
 
 
@@ -290,7 +299,7 @@ function test_bb_transcripts()
 function test_on_lego()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
-    hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    hg baup lego $CURRENT_PROJECT
     rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
@@ -342,6 +351,52 @@ function facebook()
 function facebook_protocol_handlers()
 {
     ag "r\'\^http.*?\'" $CURRENT_PROJECT -G py
+}
+
+
+
+function test_all_facebook()
+{
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+    hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook/test/test_*.py
+    do
+        # echo $f
+        filename="${filename%.*}"
+        echo filename
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
+    ag -B 1 -A 3 'indika' *.log
+    ag -B 1 -A 3 'FAIL' *.log
+    ag -B 1 -A 3 'failed' *.log
+    ag -B 1 -A 3 'passed' *.log
+}
+
+function test_all_broken_facebook()
+{
+    printf "All files are being AUPed\n"
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+    printf "Running all on Lego\n"
+    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook/test
+
+    rununittest lego -n -t '-xvs --report=skipped' test_chat_bigpipe_load.py
+    rununittest lego -n -t '-xvs --report=skipped' test_chat_with_attachments.py
+    rununittest lego -n -t '-xvs --report=skipped' test_json_comments.py
+    rununittest lego -n -t '-xvs --report=skipped' test_messages_with_images.py
+    rununittest lego -n -t '-xvs --report=skipped' test_news_dynamic_load.py
+    rununittest lego -n -t '-xvs --report=skipped' test_news_initial_load.py
+    rununittest lego -n -t '-xvs --report=skipped' test_post_image_album.py
+    rununittest lego -n -t '-xvs --report=skipped' test_pull.py
 }
 
 function test_facebook_comments()
@@ -459,57 +514,16 @@ function test_yahoo()
 }
 
 
-
-
-function test_linkedin_broken()
-{
-    printf "All files are being AUPed\n"
-    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
-
-    TARGET_FILE=test_group_search_all_discussions.py
-}
-
-
-
-function test_archiving()
-{
-    printf "All files (nbwebscan/) are being AUPed\n"
-    aup -r lego $CURRENT_PROJECT/nbwebscan/
-
-    # TARGET_FILE=test_dispatchers.py
-    # TARGET_FILE=test_features.py
-
-    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/archive/test/test_*.py
-    do
-        echo $f
-        # test_on_lego $f 2>&1 | tee /Users/indika/dev/state/logs/$f.log
-        test_on_lego $f 2>&1 | tee $f.log
-
-    if [[ "$f" != *\.* ]]
-    then
-        echo "not a file"
-    fi
-    done
-
-    rununittest lego -n -t '-xvs' $TARGET_FILE 2>&1 | tee $TARGET_FILE.log
-    cat $TARGET_FILE.log | ag 'Fetching'
-    cat $TARGET_FILE.log | ag 'indika'
-}
-
-
-
-
-function test_all_facebook()
+function test_all_linkedin()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
     hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
 
 
-    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook/test/test_*.py
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test/test_*.py
     do
-        # echo $f
         filename="${filename%.*}"
-        echo filename
+        echo $filename
         rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
 
     if [[ "$f" != *\.* ]]
@@ -525,23 +539,63 @@ function test_all_facebook()
     ag -B 1 -A 3 'passed' *.log
 }
 
-function test_all_broken_facebook()
+
+function test_linkedin_messages()
 {
-    printf "All files are being AUPed\n"
-    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+    hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
 
-    printf "Running all on Lego\n"
-    cd $CURRENT_PROJECT/nbwebscan/src/nbwebscan/facebook/test
 
-    rununittest lego -n -t '-xvs --report=skipped' test_chat_bigpipe_load.py
-    rununittest lego -n -t '-xvs --report=skipped' test_chat_with_attachments.py
-    rununittest lego -n -t '-xvs --report=skipped' test_json_comments.py
-    rununittest lego -n -t '-xvs --report=skipped' test_messages_with_images.py
-    rununittest lego -n -t '-xvs --report=skipped' test_news_dynamic_load.py
-    rununittest lego -n -t '-xvs --report=skipped' test_news_initial_load.py
-    rununittest lego -n -t '-xvs --report=skipped' test_post_image_album.py
-    rununittest lego -n -t '-xvs --report=skipped' test_pull.py
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test/test_messages*.py
+    do
+        filename="${filename%.*}"
+        echo $filename
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
+    ag -B 1 -A 3 'indika' *.log
+    ag -B 1 -A 3 'FAIL' *.log
+    ag -B 1 -A 3 'failed' *.log
+    ag -B 1 -A 3 'passed' *.log
 }
+
+
+function test_all_twitter()
+{
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+    hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter/test/test_*.py
+    do
+        filename="${filename%.*}"
+        echo $filename
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
+    ag -B 1 -A 3 'indika' *.log
+    ag -B 1 -A 3 'FAIL' *.log
+    ag -B 1 -A 3 'failed' *.log
+    ag -B 1 -A 3 'passed' *.log
+}
+
+
+
+
+
+
 
 
 
@@ -550,16 +604,13 @@ function test_all_broken_facebook()
 
 function update_lego()
 {
-    printf "Updating Lego with Current Project $CURRENT_PROJECT\n"
-    aup -r lego $CURRENT_PROJECT/nbwebscan/src/
-    aup -r lego $CURRENT_PROJECT/nbarchive/src/
+    printf "A differential update of Lego with Current Project $CURRENT_PROJECT\n"
+    hg baup lego $CURRENT_PROJECT
 
     # printf "-> Flushing Redis Cache\n"
     # ss lego 'redis-cli -n 1 flushdb'
 
     ss lego 'supervisorctl restart safechat:safechat-icap'
-
-    # cd /Users/indika/dev/box/safechat/nbwebscan/src/nbwebscan/twitter/test
 }
 
 function update_isix()
