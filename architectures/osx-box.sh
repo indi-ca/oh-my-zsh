@@ -1,6 +1,8 @@
 # BOX configuration
 
 
+# Imports
+source $ZSH/architectures/box/common.sh
 
 # Netbox Blue Specific
 
@@ -85,18 +87,6 @@ alias hgb="hg branches | sort | grep 'ipiyasena'"
 alias icap_spector="/Users/indika/.virtualenvs/safechat/bin/python $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper/icap_spector/icap_spector.py"
 
 
-alias lync_user1='rdesktop -g800x600 -r clipboard:CLIPBOARD -u user1 -d nbbdev2008 -p Oxcoda99 10.12.101.11'
-alias lync_user2='rdesktop -g800x600 -r clipboard:CLIPBOARD -u user2 -d nbbdev2008 -p Oxcoda99 10.12.101.11'
-alias lync_user3_not_work='rdesktop -g800x600 -r clipboard:CLIPBOARD -u user3 -d nbbdev2008 -p Oxcoda99 10.12.101.11'
-# alias lync_user3='rdesktop -g800x600 -r clipboard:CLIPBOARD -u Administrator -p Oxcoda99 10.3.71.1'
-# alias lync_user3='rdesktop -g800x600 -r clipboard:CLIPBOARD -u Administrator -p Oxcoda99 10.3.71.1'
-
-# alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -d nbbdev2008 -p Oxcoda99 10.12.101.11'
-alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -d nbbdev2008 -p Oxcoda2015 10.12.101.11'
-
-# Lync 2010 User on my box
-alias lync_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u user3 -d nbbdev2008 -p Oxcoda99 10.12.10.160'
-
 
 alias buildnb='ss ipiyasena@build.nb'
 alias oinknew='ss ipiyasena@oink-new.nb'
@@ -145,9 +135,17 @@ function synergy_cobalt_server()
 
 function synergy_cobalt_client()
 {
-    # --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
     /Users/indika/dev/opensource/synergy/bin/debug/synergyc -f --crypto-pass d95026058966f0712d9a1a361ad23f92 192.168.1.54 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
 }
+
+
+function synergy_teleport_copperhead()
+{
+    cd /Users/indika/dev/opensource/synergy/bin/debug
+    scp synergyc indika@copperhead:
+}
+
+
 
 
 # finish up, wrap up, close, shutdown
@@ -547,6 +545,32 @@ function test_linkedin_messages()
 
 
     for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test/test_messages*.py
+    do
+        filename="${filename%.*}"
+        echo $filename
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
+    ag -B 1 -A 3 'indika' *.log
+    ag -B 1 -A 3 'FAIL' *.log
+    ag -B 1 -A 3 'failed' *.log
+    ag -B 1 -A 3 'passed' *.log
+}
+
+
+function test_linkedin_groups()
+{
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+    hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+
+
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test/test_group*.py
     do
         filename="${filename%.*}"
         echo $filename
