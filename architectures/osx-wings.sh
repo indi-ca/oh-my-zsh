@@ -58,6 +58,12 @@ function hdserver()
     python respawn.py
 }
 
+function hd_redis()
+{
+    redis-server /opt/boxen/homebrew/etc/redis.conf
+}
+
+
 
 function synergy_wings()
 {
