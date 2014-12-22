@@ -207,8 +207,11 @@ function clear_bundles()
 function lync_msi()
 {
     ss ipiyasena@oink-new.nb 'ls -lht /packages/netbox-29.5/mslync*'
-    scp ipiyasena@oink-new.nb:/packages/netbox-29.5/mslync-29.5-51.i686.rpm .
-    sc mslync-29.5-51.i686.rpm lego:
+    scp ipiyasena@oink-new.nb:/packages/netbox-29.5/mslync-29.5-58.i686.rpm .
+    sc mslync-29.5-58.i686.rpm lego:
+
+    # Join commands using monoids
+    ss lego 'rpm -U mslync-29.5-58.i686.rpm; rpm -qa | grep mslync'
 }
 
 function test_lync()
@@ -664,6 +667,7 @@ function update_tools()
     cp -R /Users/indika/dev/box/netbox/mslync/src/mslync /Users/indika/dev/deploy/
 
     cp -R /Users/indika/dev/box/netbox/winripclient/src/winripclient /Users/indika/dev/deploy
+    cp -R /Users/indika/dev/box/netbox/winrip/src/winrip /Users/indika/dev/deploy
 
     tar cfz - "deploy" | ss lego 'cat > /home/httpd/netbox/noauth/deploy.tar'
 
