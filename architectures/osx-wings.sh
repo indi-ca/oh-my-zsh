@@ -59,10 +59,16 @@ function hdserver()
 }
 
 
-function synergy_wings()
+function synergy_wings_server()
 {
     cd /Users/indika/dev/opensource/synergy/synergy-1.5.1-Source/bin/debug
     ./synergys --config /Users/indika/Dropbox/code_library/Tools/Synergy/synergy.wings.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+}
+
+function synergy_wings_client()
+{
+    cd /Users/indika/dev/opensource/synergy/synergy-1.5.1-Source/bin/debug
+    ./synergyc -f --crypto-pass d95026058966f0712d9a1a361ad23f92 cobalt 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
 }
 
 function synergy_build()

@@ -75,13 +75,14 @@ alias nbwebscan='$CURRENT_PROJECT/nbwebscan/src/nbwebscan'
 alias yahoo='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/yahoo/messenger'
 alias linkedin='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin'
 alias twitter='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter'
+alias lync='/Users/indika/dev/box/netbox/mslync/src/mslync'
 
 
 alias pass='pwgen -y 16'
 
 
-alias write='st $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp'
-
+alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp'
+alias write_lync='st -n /Users/indika/dev/box/netbox/mslync /Users/indika/dev/deploy /Users/indika/dev/box/netbox/winripclient'
 
 alias hgb="hg branches | sort | grep 'ipiyasena'"
 alias icap_spector="/Users/indika/.virtualenvs/safechat/bin/python $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper/icap_spector/icap_spector.py"
@@ -126,10 +127,16 @@ function synergy_build()
     ./hm.sh build -d
 }
 
-function synergy_cobalt_server()
+function synergy_cobalt_copper_server()
 {
     cd /Users/indika/dev/opensource/synergy/bin/debug
-    ./synergys --config $CODE_LIBRARY/Tools/Synergy/synergy.cobalt.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+    ./synergys --config $CODE_LIBRARY/Tools/Synergy/synergy.cobalt_copper.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
+}
+
+function synergy_cobalt_wings_server()
+{
+    cd /Users/indika/dev/opensource/synergy/bin/debug
+    ./synergys --config $CODE_LIBRARY/Tools/Synergy/synergy.cobalt_wings.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
 }
 
 
@@ -196,6 +203,23 @@ function clear_bundles()
 }
 
 
+
+function lync_msi()
+{
+    ss ipiyasena@oink-new.nb 'ls -lht /packages/netbox-29.5/mslync*'
+    scp ipiyasena@oink-new.nb:/packages/netbox-29.5/mslync-29.5-51.i686.rpm .
+    sc mslync-29.5-51.i686.rpm lego:
+}
+
+function test_lync()
+{
+     cd /Users/indika/dev/box/netbox/mslync/src/mslync
+     aup -r lego .
+     ss lego 'python /usr/lib/python2.7/site-packages/mslync/window.py'
+     # ss lego 'python /usr/lib/python2.7/site-packages/mslync/test/schema_create.py'
+}
+
+
 function cloud_test_framework()
 {
     ss isix 'redis-cli -n 1 flushdb'
@@ -216,7 +240,9 @@ function cloud_test_framework()
 function test_cte()
 {
     cd /Users/indika/dev/box/netbox/cloudcte
-    update_isix
+    # update_isix
+
+    aup -r 10.4.10.194 .
 
     ss root@10.4.10.194 'restore_archive'
     ss root@10.4.10.194 '/opt/rh/python27/root/usr/bin/python /opt/rh/python27/root/usr/lib/python2.7/site-packages/cloudcte/cte_content_dispatcher.py' 2>&1 | tee test_cte.log
@@ -420,6 +446,16 @@ function test_facebook_comments()
     done
 }
 
+function test_facebook_chat()
+{
+    test_on_lego test_chat_bigpipe_load.py
+    test_on_lego test_chat_dynamic_load.py
+    test_on_lego test_chat_history.py
+    test_on_lego test_chat_receive.py
+    test_on_lego test_chat_send.py
+    test_on_lego test_chat_with_attachments.py
+}
+
 function test_facebook()
 {
     printf "Selective NBWebscan is being AUPed\n"
@@ -617,12 +653,22 @@ function test_all_twitter()
 
 
 
+function update_tools()
+{
+    cd /Users/indika/dev/
+    ss lego 'rm /home/httpd/netbox/noauth/deploy.tar'
+    sc /Users/indika/dev/box/docs/box.win.bash_rc.txt lego:/home/httpd/netbox/noauth
 
 
+    rm -rf /Users/indika/dev/deploy/mslync
+    cp -R /Users/indika/dev/box/netbox/mslync/src/mslync /Users/indika/dev/deploy/
 
+    cp -R /Users/indika/dev/box/netbox/winripclient/src/winripclient /Users/indika/dev/deploy
 
+    tar cfz - "deploy" | ss lego 'cat > /home/httpd/netbox/noauth/deploy.tar'
 
-
+    cd ~/dev/box/netbox
+}
 
 
 
@@ -636,6 +682,54 @@ function update_lego()
 
     ss lego 'supervisorctl restart safechat:safechat-icap'
 }
+
+function update_netbox_lego()
+{
+    printf "A differential update of Lego with the Netbox\n"
+    hg baup lego /Users/indika/dev/box/netbox
+}
+
+
+function report_update()
+{
+    printf "A differential update of Lego with Reports \n"
+    # hg baup lego /Users/indika/dev/box/netbox/nbreports
+
+    aup lego /Users/indika/dev/box/netbox/nbreports/src/core/feed -v
+
+    # TEST_FILE=''
+    # rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+
+    # rununittest lego /Users/indika/dev/box/netbox/nbreports/src/core/feeders/tests/test_youtube.py
+    # ss lego 'python /usr/libexec/nbreports/feeders/youtube.py'
+    ss lego 'cat /usr/libexec/nbreports/feed | grep indika'
+    ss lego 'python /usr/libexec/nbreports/feed'
+}
+
+function update_ytcache()
+{
+    printf "A differential update of Lego with YTCACHE \n"
+    hg baup lego /Users/indika/dev/box/netbox/ytcache
+
+    # printf "-> Flushing Redis Cache\n"
+    # ss lego 'redis-cli -n 1 flushdb'
+
+    ss lego 'supervisorctl restart ytcache'
+    ss lego 'tail -f /var/log/ytcache'
+}
+
+
+function social_update_lego()
+{
+    printf "A differential update of Lego with Current Project $CURRENT_PROJECT\n"
+    hg baup lego $CURRENT_PROJECT
+
+    # ss lego 'supervisorctl restart socialmediaapp'
+
+    ss lego '/usr/libexec/socialmediaapp/fbdiagnostic'
+}
+
+
 
 function update_isix()
 {
