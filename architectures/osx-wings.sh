@@ -108,13 +108,6 @@ function sync_cobalt()
 }
 
 
-
-function ad()
-{
-    ag -B 0 -C 3 $1 /Users/indika/Dropbox/code_library/Projects/Box/docs /Users/indika/dev/box/docs
-}
-
-
 function sync_cobalt()
 {
     printf "Pulling repositories from Cobalt\n"
@@ -186,14 +179,26 @@ function pygme() {
     pygmentize -f html -O full -o ${TARGET}/${1}.html ${1}
 }
 
-function fibres() {
+function fibres_edit() {
     source ~/.virtualenvs/fibres/bin/activate
     cd /Users/indika/links/dev/fibres/collector
     st . /Volumes/MacFuse/Creations/System/Apps/Fibres
     pip freeze
 }
 
-function gumtree() {
+
+function fibres() {
+    export PYTHONPATH="/Users/indika/dev/scraper"
+    source ~/.virtualenvs/fibres/bin/activate
+    python /Users/indika/dev/scraper/scraper/scrape_gumtree.py
+
+    cp -f $CODE_LIBRARY/Languages/Spanish/spanish.nugget.txt /Users/indika/Dropbox/Public/jBl3liuvOXDpvhYB/fibres
+    cp -f $CODE_LIBRARY/Haskell/haskell.nugget.txt /Users/indika/Dropbox/Public/jBl3liuvOXDpvhYB/fibres
+    cp -f $CODE_LIBRARY/Python/python.nugget.txt /Users/indika/Dropbox/Public/jBl3liuvOXDpvhYB/fibres
+}
+
+
+function gumtree_old() {
     source ~/.virtualenvs/fibres/bin/activate
     cd /Users/indika/links/dev/fibres/collector/gumtree
     st /Users/indika/Dropbox/Public/jBl3liuvOXDpvhYB/gt/exclusion_list.txt
@@ -248,11 +253,11 @@ function pod_push()
 
 function haskell()
 {
-    printf "Open a new browser window"
-    pause
+    # printf "Open a new browser window"
+    # pause
     cd /Users/indika/dev/functional
     st $CODE_LIBRARY/Haskell $CODE_LIBRARY/Projects/Euler .
-    open http://learnyouahaskell.com/higher-order-functions#higher-orderism http://www.haskell.org/haskellwiki/Typeclassopedia http://www.seas.upenn.edu/~cis194/lectures.html http://www.haskell.org/ghc/docs/latest/html/libraries/base/Data-Monoid.html http://book.realworldhaskell.org/read/writing-a-library-working-with-json-data.html
+    # open http://learnyouahaskell.com/higher-order-functions#higher-orderism http://www.haskell.org/haskellwiki/Typeclassopedia http://www.seas.upenn.edu/~cis194/lectures.html http://www.haskell.org/ghc/docs/latest/html/libraries/base/Data-Monoid.html http://book.realworldhaskell.org/read/writing-a-library-working-with-json-data.html
     # https://hackage.haskell.org/package/base
     # https://projecteuler.net/problems
     # http://www.haskell.org/haskellwiki/Typeclassopedia
