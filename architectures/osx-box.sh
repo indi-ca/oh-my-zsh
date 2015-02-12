@@ -29,7 +29,7 @@ alias pass='pwgen -y 16'
 alias rmpyc='find . -name "*.pyc" -exec rm -rf {} \;'
 alias rmlog='find . -name "*.log" -exec rm -rf {} \;'
 
-alias haskell='st -n $CODE_LIBRARY/Haskell ~/dev/functional'
+alias haskell='st -n $CODE_LIBRARY/Haskell $CODE_LIBRARY/Blog ~/dev/functional;cd ~/dev/functional'
 
 
 # This is where the messenger work is
@@ -41,9 +41,6 @@ alias haskell='st -n $CODE_LIBRARY/Haskell ~/dev/functional'
 
 # WORKON=lync_archiving
 # WORKON=facebook
-
-# WORKON=twitter_threadids
-# WORKON=twitter_dynamic
 
 
 # LINKEDIN
@@ -154,6 +151,25 @@ function synergy_teleport_copperhead()
 
 
 
+# Instance stuff
+
+function instance_build()
+{
+    cd /Users/indika/dev/functional/explore/libraries/Instance
+    cabal build
+}
+
+function instance_run()
+{
+    /Users/indika/dev/functional/explore/libraries/Instance/dist/build/Instance/Instance
+}
+
+function instance_log()
+{
+    tail -f /Users/indika/logs/instance/instance.log
+}
+
+
 
 # finish up, wrap up, close, shutdown
 function wrapup()
@@ -175,6 +191,16 @@ function twisted()
     st -n /Users/indika/dev/learn/twisted/twisted-intro
 }
 
+function connect_proxy()
+{
+    cd /Users/indika/dev/box/netbox/nbsquid/src/nbsquid
+    aup -r oldrel-default .
+    ss oldrel-default 'service connectproxy restart'
+    ss oldrel-default 'tail -f /var/log/connect_proxy.log'
+
+}
+
+
 function last_command()
 {
     var=`tail -2 ~/.zsh_history | head -1`
@@ -185,7 +211,7 @@ function last_command()
 
 function ad()
 {
-    ag -C5 $1 $CODE_LIBRARY $BOX_DOCS
+    ag -C5 --ignore-case $1 $CODE_LIBRARY $BOX_DOCS
 }
 
 
@@ -203,15 +229,36 @@ function clear_bundles()
 }
 
 
+function lxml_sandbox()
+{
+    cd /Users/indika/dev/box/lxml_sandbox
+    st -n /Users/indika/dev/box/lxml_sandbox
+
+}
+
 
 function lync_msi()
 {
-    ss ipiyasena@oink-new.nb 'ls -lht /packages/netbox-29.5/mslync*'
-    scp ipiyasena@oink-new.nb:/packages/netbox-29.5/mslync-29.5-58.i686.rpm .
-    sc mslync-29.5-58.i686.rpm lego:
+
+    ss ipiyasena@oink-new.nb 'ls -lht /packages/netbox-29.5.2/mslync*'
+    scp ipiyasena@oink-new.nb:/packages/netbox-29.5.2/mslync-29.5.2-2.i686.rpm .
+    sc mslync-29.5.2-2.i686.rpm lego:
 
     # Join commands using monoids
-    ss lego 'rpm -U mslync-29.5-58.i686.rpm; rpm -qa | grep mslync'
+    ss lego 'rpm -U mslync-29.5.1-24.i686.rpm; rpm -qa | grep mslync'
+}
+
+function update_lync()
+{
+    update_tools;
+    cd ~/dev/box/netbox
+    aup -r lego mslync;
+    aup -r lego winrip;
+    aup -r lego winripclient;
+    update_lego
+    ss lego 'service winrip restart'
+    clear_bundles
+    flush_redis
 }
 
 function test_lync()
@@ -381,6 +428,32 @@ function facebook_protocol_handlers()
 }
 
 
+
+function test_all_in_directory()
+{
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+    hg baup lego $CURRENT_PROJECT
+
+
+    for f in test_*.py
+    do
+        # echo $f
+        filename="${filename%.*}"
+        echo filename
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
+    ag -B 1 -A 3 'indika' *.log
+    ag -B 1 -A 3 'FAIL' *.log
+    ag -B 1 -A 3 'failed' *.log
+    ag -B 1 -A 3 'passed' *.log
+}
 
 function test_all_facebook()
 {
@@ -553,6 +626,9 @@ function test_yahoo()
 
 function test_all_linkedin()
 {
+    $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test
+    rmlog
+
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
     hg baup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
 
@@ -574,6 +650,25 @@ function test_all_linkedin()
     ag -B 1 -A 3 'FAIL' *.log
     ag -B 1 -A 3 'failed' *.log
     ag -B 1 -A 3 'passed' *.log
+}
+
+function query_all_linkedin()
+{
+
+    for f in $CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin/test/data/icap/icap*respmod*.request
+    do
+        # filename="${filename%.*}"
+        # echo $filename
+        echo $f
+        showicap --bare $f | htmlselect - "li.feed-item.linkedin-comment"
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
+
 }
 
 
@@ -654,6 +749,15 @@ function test_all_twitter()
     ag -B 1 -A 3 'passed' *.log
 }
 
+function test_twitter_messages()
+{
+    test_on_lego test_direct_messages_json.py
+    test_on_lego test_sent_direct_message.py
+
+    #TODO: The session viewer needs to be set
+    #test_on_lego test_toasts.py
+    test_on_lego test_groups.py
+}
 
 
 function update_tools()
@@ -719,7 +823,8 @@ function update_ytcache()
     # ss lego 'redis-cli -n 1 flushdb'
 
     ss lego 'supervisorctl restart ytcache'
-    ss lego 'tail -f /var/log/ytcache'
+    ss lego 'supervisorctl restart ytcache-icap'
+    # ss lego 'less /var/log/ytcache/access'
 }
 
 
@@ -761,6 +866,20 @@ function fetch_icaps()
 
     # Now parse them
     /Users/indika/.virtualenvs/safechat/bin/python /Users/indika/dev/box/helper/icap_inspector/data/icaps/icap_plain_text.py --dir /Users/indika/temp/icaps
+
+    for f in /Users/indika/temp/icaps/*.request
+    do
+        filename="${f}.txt"
+        echo $filename
+        # rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+        showicap --pretty $f > $filename
+
+    if [[ "$f" != *\.* ]]
+    then
+        echo "not a file"
+    fi
+
+    done
 }
 
 function fetch_bundles()
@@ -781,6 +900,8 @@ function clear_cache()
 {
     printf "Clearing Debug cache on Lego\n"
     ss lego 'rm -rf /tmp/debug_cache/*'
+    ss lego 'mkdir -p /tmp/debug_cache'
+
 }
 
 function sync_cobalt()
