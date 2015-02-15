@@ -67,7 +67,7 @@ function hd_redis()
 
 function synergy_wings_server()
 {
-    cd /Users/indika/dev/opensource/synergy/synergy-Source/bin/debug
+    cd /Users/indika/dev/opensource/synergy/synergy-Source/bin
     ./synergys --config /Users/indika/Dropbox/code_library/Tools/Synergy/synergy.wings.conf -f --crypto-pass d95026058966f0712d9a1a361ad23f92 2>&1 | tee  /Users/indika/logs/synergy/synergy.log
 }
 
