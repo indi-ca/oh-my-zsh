@@ -67,6 +67,7 @@ alias getpath="pwd | tr -d '\n' | pbcopy"
 alias hgbii='hg branches | grep ipiyasena'
 
 
+alias safechat='$CURRENT_PROJECT'
 alias nbwebscan='$CURRENT_PROJECT/nbwebscan/src/nbwebscan'
 
 alias yahoo='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/yahoo/messenger'
@@ -108,12 +109,29 @@ function aupr()
 
 function hd()
 {
-    python /Users/indika/dev/sandbox/command_line/screen.py
+    /Users/indika/dev/hd/dist/build/hd/hd
+
+    # Another old one
+    # /Users/indika/dev/learn/explore/haskell-ncurses/dist/build/explore/explore
+
+    # This is the old one
+    # python /Users/indika/dev/sandbox/command_line/screen.py
 }
 
 function hdserver()
 {
 
+}
+
+function hd_edit()
+{
+    st -n /Users/indika/dev/hd /Users/indika/dev/learn/explore/haskell-ncurses
+}
+
+function hd_build()
+{
+    cd /Users/indika/dev/hd
+    cabal build
 }
 
 # Synergy stuff
@@ -169,6 +187,10 @@ function instance_log()
     tail -f /Users/indika/logs/instance/instance.log
 }
 
+function instance_proc()
+{
+    runhaskell /Users/indika/dev/functional/explore/libraries/Proc.hs
+}
 
 
 # finish up, wrap up, close, shutdown
@@ -201,6 +223,48 @@ function connect_proxy()
 }
 
 
+function update_grub()
+{
+    cd /Users/indika/dev/box/netbox/grubaux
+    aup -r motor . -v;
+    ss motor "/bin/echo -e 'indika' > /tmp/grub-password"
+    ss motor 'nbconf grub-config; tail -n 20 /boot/grub2/grub.cfg'
+    # ss motor 'reboot'
+}
+
+
+function external_packages()
+{
+    cd /Users/indika/dev/box/internal
+    aup build7.nb nb-devtools/modules/nbdev/test_sync.py
+    aup build7.nb nb-devtools/modules/nbdev/sync.py
+    aup build7.nb nb-devtools/modules/nbdev/sync_presync.py
+    aup build7.nb nb-devtools/modules/nbdev/build.py
+
+    # ss ipiyasena@build7.nb 'cd /home/ipiyasena/build/netbox; /usr/bin/env python2.7 -m nbdev.test_sync'
+    ss ipiyasena@build7.nb 'cd /home/ipiyasena/build/netbox; /usr/bin/env python2.7 -m nbdev.sync_presync'
+}
+
+function dns-nbdb()
+{
+    cd /Users/indika/dev/box/netbox
+
+    aup -r motor nbdbmaint -v
+
+    aup motor nbadmin/src/nbdb.d/creatednsdb.py -v
+    ss motor '/usr/libexec/nbdb.d/creatednsdb.py'
+}
+
+
+function space-chunks()
+{
+    cd /Users/indika/dev/box/netbox/space
+
+    aup -r motor . -v
+    ss motor 'sh /files/chunks/contents.sh'
+}
+
+
 function last_command()
 {
     var=`tail -2 ~/.zsh_history | head -1`
@@ -214,6 +278,10 @@ function ad()
     ag -C5 --ignore-case $1 $CODE_LIBRARY $BOX_DOCS
 }
 
+function hashchat()
+{
+    curl http://misc-c7.nb:8007/messages\?channels\=%23chat\&limit\=1000 | grep something
+}
 
 
 function flush_redis()
@@ -373,8 +441,12 @@ function test_bb_transcripts()
 function test_on_lego()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+
+
     hg baup lego $CURRENT_PROJECT
+    # hg baup 10.3.115.254 $CURRENT_PROJECT
     rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
     ag -B 1 -A 3 'FAIL' $1.log
@@ -778,6 +850,15 @@ function update_tools()
     cd ~/dev/box/netbox
 }
 
+function motor_post_init()
+{
+    sc /Users/indika/dev/box/docs/box.motor.bash_rc.txt motor:.bashrc
+}
+
+function shan_post_init()
+{
+    scp /Users/indika/dev/box/docs/box.shan.bash_rc.txt root@shan:.bashrc
+}
 
 
 function update_lego()
@@ -798,21 +879,53 @@ function update_netbox_lego()
 }
 
 
-function report_update()
+function update_reports()
 {
-    printf "A differential update of Lego with Reports \n"
-    # hg baup lego /Users/indika/dev/box/netbox/nbreports
+    # printf "A differential update of Lego with Reports \n"
+    # # hg baup lego /Users/indika/dev/box/netbox/nbreports
 
-    aup lego /Users/indika/dev/box/netbox/nbreports/src/core/feed -v
+    # aup lego /Users/indika/dev/box/netbox/nbreports/src/core/feed -v
+    # aup lego /Users/indika/dev/box/netbox/nbreports/src/core/db_test.py -v
+    # # aup lego /Users/indika/dev/box/netbox/nbreports/src/core/progress.py -v
 
-    # TEST_FILE=''
-    # rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    # # ss lego 'cat /usr/libexec/nbreports/feed | grep indika'
+    # # ss lego 'python /usr/libexec/nbreports/feed'
+    # ss lego 'python /usr/libexec/nbreports/db_test.py'
 
-    # rununittest lego /Users/indika/dev/box/netbox/nbreports/src/core/feeders/tests/test_youtube.py
-    # ss lego 'python /usr/libexec/nbreports/feeders/youtube.py'
-    ss lego 'cat /usr/libexec/nbreports/feed | grep indika'
-    ss lego 'python /usr/libexec/nbreports/feed'
+    # print "\n\n\n\n"
+
+
+    # UPDATE THE PSYCO MODULE
+    # cd /Users/indika/temp
+    # sc ipiyasena@build7.nb:/var/spool/build/user/ipiyasena/RPMS/x86_64/python-psycopg2-2.4.5-8nb.el7.centos.x86_64.rpm .
+    # sc python-psycopg2-2.4.5-8nb.el7.centos.x86_64.rpm motor:
+    # ss motor 'rpm -Uvh --force python-psycopg2-2.4.5-8nb.el7.centos.x86_64.rpm'
+    # ss motor 'ls -l /usr/lib64/python2.7/site-packages/psycopg2/_psycopg.so'
+
+
+    aup motor /Users/indika/dev/box/netbox/nbreports/src/core/feed -v
+    aup motor /Users/indika/dev/box/netbox/nbreports/src/core/db_test.py -v
+    aup motor /Users/indika/dev/box/netbox/nbreports/src/core/progress.py -v
+    # ss motor 'cat /usr/libexec/nbreports/feed | grep indika'
+    ss motor 'python /usr/libexec/nbreports/feed'
+    # ss motor 'python /usr/libexec/nbreports/db_test.py'
+
+    ss motor 'systemctl restart nbreports.service'
+    ss motor 'systemctl | grep failed'
+    # ss motor 'journalctl -u nbreports.service'
 }
+
+
+
+fuction test_postgrey()
+{
+    aup motor /Users/indika/dev/box/netbox/nbpostfix/src/nbpostfix/postgrey.py -v
+    ss motor 'systemctl restart postgreyd.service'
+}
+
+
+
+
 
 function update_ytcache()
 {
@@ -894,6 +1007,8 @@ function fetch_cache()
     cd ~
     rm -rf /Users/indika/temp/debug_cache
     sc -r lego:/tmp/debug_cache /Users/indika/temp/debug_cache
+    cd ~/temp/debug_cache
+    fdupes -dN ~/temp/debug_cache
 }
 
 function clear_cache()

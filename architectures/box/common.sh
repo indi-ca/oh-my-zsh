@@ -9,7 +9,7 @@ alias lync_user3_not_work='rdesktop -g800x600 -r clipboard:CLIPBOARD -u user3 -d
 
 
 
-alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -d nbbdev2008 -p Oxcoda201411 10.12.101.11'
+alias lync_admin='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -d nbbdev2008 -p Oxcoda201503 10.12.101.11'
 alias lync_admin_root='rdesktop -g1920x1160 -r clipboard:CLIPBOARD -u Administrator -p Oxcoda99 10.12.101.11'
 
 # Lync 2010 User on my box
