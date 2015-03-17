@@ -67,19 +67,19 @@ alias getpath="pwd | tr -d '\n' | pbcopy"
 alias hgbii='hg branches | grep ipiyasena'
 
 
-alias safechat='$CURRENT_PROJECT'
-alias nbwebscan='$CURRENT_PROJECT/nbwebscan/src/nbwebscan'
+alias safechat='$CURRENT_PROJECT/nbwebscan/src/nbwebscan'
 
 alias yahoo='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/yahoo/messenger'
 alias linkedin='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin'
 alias twitter='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter'
+alias aim='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/aim'
 alias lync='/Users/indika/dev/box/netbox/mslync/src/mslync'
 
 
 alias pass='pwgen -y 16'
 
 
-alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp'
+alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /opt/boxen/repo/modules /opt/boxen/repo/manifests'
 alias write_lync='st -n /Users/indika/dev/box/netbox/mslync /Users/indika/dev/deploy /Users/indika/dev/box/netbox/winripclient'
 
 alias hgb="hg branches | sort | grep 'ipiyasena'"
@@ -102,6 +102,14 @@ function aupr()
     printf "-> Recursive AUP to Lego and Squid Restart\n"
     aup -r lego .
     ss lego '/etc/init.d/safechat_icap restart'
+}
+
+
+# Boxen stuff
+
+function boxen_edit()
+{
+    st -n /opt/boxen/repo /Users/indika/dev/boxen-learn /Users/indika/dev/my-boxen/puppet /Users/indika/Dropbox/code_library/Tools/tools.boxen*
 }
 
 
@@ -443,7 +451,24 @@ function test_on_lego()
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
 
 
-    hg baup lego $CURRENT_PROJECT
+    hg baup oldrel-default $CURRENT_PROJECT
+    # hg baup 10.3.115.254 $CURRENT_PROJECT
+    rununittest oldrel-default -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+
+    ag -B 1 -A 3 'indika' $1.log
+    ag -B 1 -A 3 'FAIL' $1.log
+    ag -B 1 -A 3 'passed' $1.log
+
+    printf "TESTING: %s" % $1
+}
+
+function test_on_lego_clean()
+{
+    printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
+
+
+    hg baup lego /Users/indika/dev/box/safechat_clean
     # hg baup 10.3.115.254 $CURRENT_PROJECT
     rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
     # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
@@ -504,7 +529,7 @@ function facebook_protocol_handlers()
 function test_all_in_directory()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
-    hg baup lego $CURRENT_PROJECT
+    hg baup oldrel-default $CURRENT_PROJECT
 
 
     for f in test_*.py
@@ -512,7 +537,7 @@ function test_all_in_directory()
         # echo $f
         filename="${filename%.*}"
         echo filename
-        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+        rununittest oldrel-default -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
 
     if [[ "$f" != *\.* ]]
     then
@@ -978,7 +1003,7 @@ function fetch_icaps()
     sc lego:/var/tmp/safechat/icap/\*.request   /Users/indika/temp/icaps/
 
     # Now parse them
-    /Users/indika/.virtualenvs/safechat/bin/python /Users/indika/dev/box/helper/icap_inspector/data/icaps/icap_plain_text.py --dir /Users/indika/temp/icaps
+    # /Users/indika/.virtualenvs/safechat/bin/python /Users/indika/dev/box/helper/icap_inspector/data/icaps/icap_plain_text.py --dir /Users/indika/temp/icaps
 
     for f in /Users/indika/temp/icaps/*.request
     do
@@ -1064,6 +1089,6 @@ function sync_cobalt()
 
 
 # activate
-source $VIRTUALENV_ROOT/safechat/bin/activate
+source $VIRTUALENV_ROOT/dev/bin/activate
 
 
