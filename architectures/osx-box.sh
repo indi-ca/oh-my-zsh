@@ -451,9 +451,9 @@ function test_on_lego()
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
 
 
-    hg baup oldrel-default $CURRENT_PROJECT
+    hg baup lego $CURRENT_PROJECT
     # hg baup 10.3.115.254 $CURRENT_PROJECT
-    rununittest oldrel-default -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
     # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
@@ -529,7 +529,7 @@ function facebook_protocol_handlers()
 function test_all_in_directory()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
-    hg baup oldrel-default $CURRENT_PROJECT
+    hg baup lego $CURRENT_PROJECT
 
 
     for f in test_*.py
@@ -537,7 +537,7 @@ function test_all_in_directory()
         # echo $f
         filename="${filename%.*}"
         echo filename
-        rununittest oldrel-default -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
+        rununittest lego -n -t '-xvs --report=skipped' $f 2>&1 | tee $f.log
 
     if [[ "$f" != *\.* ]]
     then

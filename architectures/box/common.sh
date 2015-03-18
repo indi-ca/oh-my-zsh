@@ -27,6 +27,12 @@ alias lync_beast_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u testlyncus
 
 
 alias aim_win='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u netboxblue -p oxcoda99 10.3.20.219'
-alias win7_indika='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u netboxblue -p oxcoda99 10.3.20.219'
+
+
+# This surely must have worked
+# The IP address was when it was connected to Dev, but now it is the VM Network
+# Note sure which domain the netboxblue user was for
+# alias win7_indika='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u netboxblue -p oxcoda99 10.3.20.219'
+alias win7_indika='rdesktop -g900x1000 -r clipboard:CLIPBOARD -u Administrator -p Oxcoda99 -d labs 10.12.11.226'
 
 
