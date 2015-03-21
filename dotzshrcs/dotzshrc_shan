@@ -54,7 +54,7 @@ plugins=(cabal jump git mercurial zsh_reload)
 source $ZSH/architectures/osx-common.sh
 
 # Perhaps this file should be a template
-source $ZSH/architectures/osx-shan.sh
+source $ZSH/architectures/linux-shan.sh
 
 source $ZSH/oh-my-zsh.sh
 
