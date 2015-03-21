@@ -1,0 +1,86 @@
+# Path to your oh-my-zsh configuration.
+ZSH=$HOME/.oh-my-zsh
+
+#source ~/.bashrc
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+ZSH_THEME="af-magic"
+
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+
+
+# Set to this to use case-sensitive completion
+# CASE_SENSITIVE="true"
+
+# Comment this out to disable bi-weekly auto-update checks
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment to change how often before auto-updates occur? (in days)
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment following line if you want to disable colors in ls
+# DISABLE_LS_COLORS="true"
+
+# Uncomment following line if you want to disable autosetting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment following line if you want to disable command autocorrection
+# DISABLE_CORRECTION="true"
+
+# Uncomment following line if you want red dots to be displayed while waiting for completion
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment following line if you want to disable marking untracked files under
+# VCS as dirty. This makes repository status check for large repositories much,
+# much faster.
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+
+
+# PLUGINS
+# Adding osx gives me an error about .rvm/scripts/initialize:44: __rvm_cleanse_variables: function definition file not found
+# plugins=(cabal jump git mercurial osx pyenv python vi-mode zsh_reload)
+plugins=(cabal jump git mercurial zsh_reload)
+
+# Start by sourcing Boxen
+# TODO: I probably don't want to set this at the end???
+
+source $ZSH/architectures/osx-common.sh
+
+# Perhaps this file should be a template
+source $ZSH/architectures/osx-cobalt.sh
+
+
+source $ZSH/oh-my-zsh.sh
+
+
+
+# Customize to your needs...
+#export PATH=$PATH:/Users/indika/.rvm/gems/ruby-1.9.3-p362/bin:/Users/indika/.rvm/gems/ruby-1.9.3-p362@global/bin:/Users/indika/.rvm/rubies/ruby-1.9.3-p362/bin:/Users/indika/.rvm/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/local/share/npm/bin:/Applications/Postgres.app/Contents/MacOS/bin:/usr/local/bin:/usr/local/share/python:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/git/bin:/usr/texbin:/usr/local/sbin
+#export PATH=$PATH:/Users/indika/Plasma/Environment/Programs/gradle-1.10/bin
+export PATH=$PATH:/Users/indika/dev/box/internal/nb-devtools/bin:/Users/indika/.cabal/bin
+export PATH="$HOME/Library/Haskell/bin:$PATH"
+export PYTHONPATH=$PYTHONPATH:'/Users/indika/dev/box/internal/nb-devtools/modules'
+
+
+alias ll="ls -la"
+
+#TODO: I can get rid of this now
+alias resource="source ~/.zshrc"
+
+alias ohmyzsh="st -n ~/.zshrc ~/.bashrc  ~/.oh-my-zsh ~/.oh-my-zsh/architectures/osx-box.sh"
+
+clip () {
+   echo "$*" | pbcopy
+}
+
+# Overrides
+alias gs='echo "Ghostscipt has been nullified"'
+
+# source /opt/boxen/env.sh
