@@ -2,6 +2,13 @@
 
 
 
+# Imports
+source $ZSH/architectures/box/common.sh
+
+
+alias ohmyzsh="st -n ~/.zshrc ~/.bashrc  ~/.oh-my-zsh ~/.oh-my-zsh/architectures/osx-wings.sh"
+
+
 # Motion specific
 
 export MOTION_PORT=59397

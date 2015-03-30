@@ -71,7 +71,6 @@ alias ll="ls -la"
 #TODO: I can get rid of this now
 alias resource="source ~/.zshrc"
 
-alias ohmyzsh="st -n ~/.zshrc ~/.bashrc  ~/.oh-my-zsh ~/.oh-my-zsh/architectures/osx-box.sh"
 
 clip () {
    echo "$*" | pbcopy
