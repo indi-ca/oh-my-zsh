@@ -84,18 +84,13 @@ alias aim='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/aim'
 alias pass='pwgen -y 16'
 
 
-alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /opt/boxen/repo/modules /opt/boxen/repo/manifests'
+alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /Users/indika/dev/opensource/hist /Users/indika/.oh-my-zsh/architectures/osx-cobalt.sh'
+# alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /opt/boxen/repo/modules /opt/boxen/repo/manifests /Users/indika/.oh-my-zsh/architectures/osx-cobalt.sh'
 alias write_lync='st -n /Users/indika/dev/box/netbox/mslync /Users/indika/dev/deploy /Users/indika/dev/box/netbox/winripclient'
 
 alias hgb="hg branches | sort | grep 'ipiyasena'"
 alias icap_spector="/Users/indika/.virtualenvs/safechat/bin/python $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper/icap_spector/icap_spector.py"
 
-
-
-alias buildnb='ss ipiyasena@build.nb'
-alias oinknew='ss ipiyasena@oink-new.nb'
-# alias six= echo '10.4.10.194' | pbcopy
-# alias isix='ss root@10.4.10.194'
 
 
 # Generic stuff
@@ -146,6 +141,8 @@ function hd_build()
     cd /Users/indika/dev/hd
     cabal build
 }
+
+
 
 # Synergy stuff
 
@@ -215,7 +212,6 @@ function wrapup()
     printf "-> Delete a snapshot\n"
     printf "-> Leftovers in refridgerator\n"
     printf "-> Shutdown Lego\n"
-    printf "-> Delete branch 7234\n"
     printf "Remember to see what is for later in box.next\n"
 }
 
@@ -233,16 +229,6 @@ function connect_proxy()
     ss oldrel-default 'service connectproxy restart'
     ss oldrel-default 'tail -f /var/log/connect_proxy.log'
 
-}
-
-
-function update_grub()
-{
-    cd /Users/indika/dev/box/netbox/grubaux
-    aup -r motor . -v;
-    ss motor "/bin/echo -e 'indika' > /tmp/grub-password"
-    ss motor 'nbconf grub-config; tail -n 20 /boot/grub2/grub.cfg'
-    # ss motor 'reboot'
 }
 
 
@@ -297,16 +283,24 @@ function hashchat()
 }
 
 
+function clear_flush()
+{
+    flush_redis
+    clear_bundles
+}
+
 function flush_redis()
 {
     printf "Resetting Cache\n"
     ss lego 'redis-cli -n 1 flushdb'
+    # ss motor 'redis-cli -n 1 flushdb'
 }
 
 function clear_bundles()
 {
     printf "Clearing all bundles\n"
     ss lego 'rm -rf /var/nbwebscan/bundles/*'
+    # ss motor 'rm -rf /var/nbwebscan/bundles/*'
 }
 
 
@@ -315,6 +309,72 @@ function lxml_sandbox()
     cd /Users/indika/dev/box/lxml_sandbox
     st -n /Users/indika/dev/box/lxml_sandbox
 
+}
+
+
+function srm_update()
+{
+    cd /Users/indika/dev/box/srm/srm/src/srm/facebook
+    aup srm recorder.py
+    aup srm graph.py
+    aup srm debugging.py
+    # hg baup 10.107.11.246 /Users/indika/dev/box/srm/srm/src/srm/facebook
+    # aup 10.107.11.246 web.py
+    ss 10.107.11.246 'systemctl restart srmfacebook-web srmfacebook-recorder srmfacebook-poller'
+    date
+}
+
+
+function srm_test()
+{
+    cd /Users/indika/dev/box/srm/srm/src/srm/facebook
+    aup srm parsers.py -v
+    cd /Users/indika/dev/box/srm/srm/src/srm/facebook/test
+    aup -r srm /Users/indika/dev/box/srm/srm/src/srm/facebook/test -v
+    ss srm 'cd /usr/lib/python2.7/site-packages/srm/facebook/test; py.test -xvs .' 2>&1 | tee srm_test.log
+}
+
+
+function srm_fetch_cache()
+{
+    printf "Re-Fetching SRM cache from srm\n"
+    cd ~
+    rm -rf /Users/indika/temp/srm_cache
+    sc -r 10.107.11.246:/tmp/realtime /Users/indika/temp/srm_cache
+    cd ~/temp/srm_cache
+    fdupes -dN ~/temp/srm_cache
+}
+
+
+function cert_update()
+{
+    cd /Users/indika/dev/box/agent/certinstaller-osx
+    sc build-updater-pkg ipiyasena@build7.nb:/home/ipiyasena/build/agent/certinstaller-osx/build-updater-pkg
+    sc /Users/indika/dev/box/agent/certinstaller-osx/installroot/Applications/BYODUpdater.app/Contents/MacOS/certinstall ipiyasena@build7.nb:/home/ipiyasena/build/agent/certinstaller-osx/installroot/Applications/BYODUpdater.app/Contents/MacOS
+    sc /Users/indika/dev/box/agent/osxurlfetch/macbuild ipiyasena@build7.nb:/home/ipiyasena/build/agent/osxurlfetch/macbuild
+
+    sc /Users/indika/dev/box/agent/osxurlfetch/src/OSXURLFetch/OSXURLFetch/main.m admin@macbuild27.nb:/Users/admin/build/agent/osxurlfetch/src/OSXURLFetch/OSXURLFetch
+    sc /Users/indika/dev/box/agent/osxurlfetch/macbuild admin@macbuild27.nb:/Users/admin/build/agent/osxurlfetch/macbuild
+}
+
+function cert_build()
+{
+    ss ipiyasena@build7.nb 'cd /var/spool/build/user/ipiyasena/RPMS/x86_64/; rm -f certinstaller_osx*'
+
+    cd /Users/indika/dev/box/agent/certinstaller-osx
+    ss ipiyasena@build7.nb 'cd /home/ipiyasena/build/agent/certinstaller-osx; hg build --notag --force'
+
+    ss ipiyasena@build7.nb 'cd /tmp/cert; rm /tmp/cert/certinstaller_osx.rpm; rm -rf home'
+    ss ipiyasena@build7.nb 'cp /var/spool/build/user/ipiyasena/RPMS/x86_64/certinstaller_osx-5.5-1.x86_64.rpm /tmp/cert/certinstaller_osx.rpm'
+    ss ipiyasena@build7.nb 'cd /tmp/cert; rpm2cpio certinstaller_osx.rpm | cpio -idmv'
+    sc ipiyasena@build7.nb:/tmp/cert/home/httpd/netbox/certcheck/install/byodupdater.pkg .
+}
+
+function cert_install()
+{
+    cd /Users/indika/dev/box/agent/certinstaller-osx
+    sudo installer -pkg byodupdater.pkg -target /
+    cd /Applications/BYODUpdater.app/Contents/MacOS
 }
 
 
@@ -342,35 +402,95 @@ function update_lync()
     flush_redis
 }
 
-function tl()
+function lync_server()
 {
 
-    cd /Users/indika/dev/box/netbox/mslync_groupchat
-    aup -r --no-restrict --platform winrip Administrator@10.12.101.11 . -v
+    cd /Users/indika/dev/box/netbox
+    hg baup lego .
 
-    # cd /Users/indika/dev/box/netbox/nblog/src/nblog
-    # aup -r --no-restrict Administrator@10.12.101.11 .
+    cd /Users/indika/dev/box/netbox/winrip
+    aup -r lego .
 
-    # cd /Users/indika/dev/box/netbox/nbshared/src/nbshared
-    # aup -r --no-restrict Administrator@10.12.101.11 .
+    cd $CURRENT_PROJECT
+    hg baup lego $CURRENT_PROJECT
 
-    # cd /Users/indika/dev/box/netbox/winrip/src/winrip
-    # aup -r --no-restrict --platform netbox Administrator@10.12.101.11 .
+    # ss lego 'service winrip restart'
+    ss lego 'systemctl restart winrip.service'
+}
 
-    # cd /Users/indika/dev/box/netbox/winripclient/src/winripclient
-    # aup -r --no-restrict Administrator@10.12.101.11 .
+function lync_client_lyncadmin()
+{
+    cd /Users/indika/dev/box/netbox/mslync
+    aup -r --no-restrict --platform winrip Administrator@lyncadmin . -v
 
-    ss Administrator@10.12.101.11 'cd /usr/lib/python2.7/site-packages/mslync_groupchat/test; /cygdrive/c/dev/python276-32/python test_libraries.py'
+    cd /Users/indika/dev/box/netbox/mslyncchat
+    aup -r --no-restrict --platform winrip Administrator@lyncadmin . -v
 
-    # cd /Users/indika/dev/box/netbox/mslync/src/mslync
-    # gca -m 'change'
-    # git push win master
+    cd /Users/indika/dev/box/netbox/nblog/src/nblog
+    aup -r --no-restrict Administrator@lyncadmin . -v
+
+    cd /Users/indika/dev/box/netbox/nbshared/src/nbshared
+    aup -r --no-restrict --platform netbox Administrator@lyncadmin . -v
+
+    cd /Users/indika/dev/box/netbox/winrip/src/winrip
+    aup -r --no-restrict --platform netbox Administrator@lyncadmin . -v
+
+    cd /Users/indika/dev/box/netbox/winripclient/src/winripclient
+    aup -r --no-restrict Administrator@lyncadmin . -v
+}
+
+function lync_client_winsvr()
+{
+    cd /Users/indika/dev/box/netbox/mslync
+    aup -r --no-restrict --platform winrip Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/mslyncchat
+    aup -r --no-restrict --platform winrip Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/nblog/src/nblog
+    aup -r --no-restrict Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/nbshared/src/nbshared
+    aup -r --no-restrict --platform netbox Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/winrip/src/winrip
+    aup -r --no-restrict --platform netbox Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/winripclient/src/winripclient
+    aup -r --no-restrict Administrator@winsvr . -v
+}
 
 
-     # cd /Users/indika/dev/box/netbox/mslync/src/mslync
-     # aup -r lego .
-     # ss lego 'python /usr/lib/python2.7/site-packages/mslync/window.py'
-     # ss lego 'python /usr/lib/python2.7/site-packages/mslync/test/schema_create.py'
+function lync_test_lyncadmin()
+{
+    cd /Users/indika/dev/box/netbox/mslync
+    aup -r --no-restrict --platform winrip Administrator@lyncadmin . -v
+
+    cd /Users/indika/dev/box/netbox/mslyncchat
+    aup -r --no-restrict --platform winrip Administrator@lyncadmin . -v
+
+    ss Administrator@lyncadmin 'cd /usr/lib/python2.7/site-packages/mslync/test; /cygdrive/c/dev/python276-32/Scripts/py.test -xvs .' 2>&1 | tee mslync_test.log
+    ss Administrator@lyncadmin 'cd /usr/lib/python2.7/site-packages/mslyncchat/test; /cygdrive/c/dev/python276-32/Scripts/py.test -xvs .' 2>&1 | tee mslyncchat_test.log
+
+    ag -B 1 -A 3 'indika' *test.log
+    ag -B 1 -A 3 'FAIL' *test.log
+    ag -B 1 -A 3 'traceback' *test.log
+}
+
+function lync_test_winsvr()
+{
+    cd /Users/indika/dev/box/netbox/mslync
+    aup -r --no-restrict --platform winrip Administrator@winsvr . -v
+
+    cd /Users/indika/dev/box/netbox/mslyncchat
+    aup -r --no-restrict --platform winrip Administrator@winsvr . -v
+
+    ss Administrator@winsvr 'cd /usr/lib/python2.7/site-packages/mslync/test; /cygdrive/c/dev/python276-32/Scripts/py.test -xvs .' 2>&1 | tee mslync_test.log
+    ss Administrator@winsvr 'cd /usr/lib/python2.7/site-packages/mslyncchat/test; /cygdrive/c/dev/python276-32/Scripts/py.test -xvs .' 2>&1 | tee mslyncchat_test.log
+
+    ag -B 1 -A 3 'indika' *test.log
+    ag -B 1 -A 3 'FAIL' *test.log
+    ag -B 1 -A 3 'traceback' *test.log
 }
 
 
@@ -512,7 +632,8 @@ function test_on_lego_clean()
 function test_on_motor()
 {
     printf "All files (src/nbwebscan/) are being AUPed to MOTOR\n"
-    aup -r motor $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    # aup -r motor $CURRENT_PROJECT/nbwebscan/src/nbwebscan/
+    hg baup motor $CURRENT_PROJECT
     rununittest motor -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
@@ -558,7 +679,6 @@ function test_all_in_directory()
 {
     printf "HG differential (src/nbwebscan/)  AUPed to LEGO\n"
     hg baup lego $CURRENT_PROJECT
-
 
     for f in test_*.py
     do
@@ -885,22 +1005,48 @@ function test_twitter_messages()
 }
 
 
+function update_tools_lego()
+{
+    # Need dev tools
+
+    # Lego Dev
+    sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt lego:.bashrc
+    ss lego 'mkdir /tmp/debug_cache'
+
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/helper
+
+    aup -r lego $CURRENT_PROJECT/nbarchive/src/nbarchive/test
+
+    aup -r lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/test
+    aup lego $CURRENT_PROJECT/nbwebscan/src/nbwebscan/conftest.py
+    aup -r lego /Users/indika/dev/box/netbox/nb-test/py.test  -v
+}
+
+
 function update_tools()
 {
-    cd /Users/indika/dev/
-    ss lego 'rm /home/httpd/netbox/noauth/deploy.tar'
-    sc /Users/indika/dev/box/docs/box.win.bash_rc.txt lego:/home/httpd/netbox/noauth
+    update_tools_lego
+
+    scp /Users/indika/dev/box/docs/box.lyncwinsvr.bash_rc.txt Administrator@winsvr:.bashrc
+    scp /Users/indika/dev/box/docs/box.lyncadmin.bash_rc.txt Administrator@lyncadmin:.bashrc
 
 
-    rm -rf /Users/indika/dev/deploy/mslync
-    cp -R /Users/indika/dev/box/netbox/mslync/src/mslync /Users/indika/dev/deploy/
+    sc /Users/indika/dev/box/docs/box.blue.bash_rc.txt ipiyasena@blue.nb:.bashrc
 
-    cp -R /Users/indika/dev/box/netbox/winripclient/src/winripclient /Users/indika/dev/deploy
-    cp -R /Users/indika/dev/box/netbox/winrip/src/winrip /Users/indika/dev/deploy
+    # cd /Users/indika/dev/
+    # ss lego 'rm /home/httpd/netbox/noauth/deploy.tar'
+    # sc /Users/indika/dev/box/docs/box.win.bash_rc.txt lego:/home/httpd/netbox/noauth
 
-    tar cfz - "deploy" | ss lego 'cat > /home/httpd/netbox/noauth/deploy.tar'
 
-    cd ~/dev/box/netbox
+    # rm -rf /Users/indika/dev/deploy/mslync
+    # cp -R /Users/indika/dev/box/netbox/mslync/src/mslync /Users/indika/dev/deploy/
+
+    # cp -R /Users/indika/dev/box/netbox/winripclient/src/winripclient /Users/indika/dev/deploy
+    # cp -R /Users/indika/dev/box/netbox/winrip/src/winrip /Users/indika/dev/deploy
+
+    # tar cfz - "deploy" | ss lego 'cat > /home/httpd/netbox/noauth/deploy.tar'
+
+    # cd ~/dev/box/netbox
 }
 
 function motor_post_init()
@@ -920,6 +1066,13 @@ function lyncadmin_post_init()
 }
 
 
+function lync_winsvr_post_init()
+{
+    scp /Users/indika/dev/box/docs/box.lyncwinsvr.bash_rc.txt Administrator@winsvr:.bashrc
+    # scp /Users/indika/dev/box/docs/box.win.bash_rc.txt Administrator@winsvr:/cygdrive/c/Users/administrator.NBBDEV2008/.bashrc
+}
+
+
 function update_lego()
 {
     printf "A differential update of Lego with Current Project $CURRENT_PROJECT\n"
@@ -928,7 +1081,20 @@ function update_lego()
     # printf "-> Flushing Redis Cache\n"
     # ss lego 'redis-cli -n 1 flushdb'
 
-    ss lego 'supervisorctl restart safechat:safechat-icap'
+    # ss lego 'supervisorctl restart safechat:safechat-icap'
+    ss lego 'systemctl restart safechat_icap.service'
+}
+
+function update_motor()
+{
+    printf "A differential update of Motor with Current Project $CURRENT_PROJECT\n"
+    hg baup motor $CURRENT_PROJECT
+
+    # printf "-> Flushing Redis Cache\n"
+    # ss motor 'redis-cli -n 1 flushdb'
+
+    ss motor 'systemctl daemon-reload'
+    ss motor 'systemctl restart safechat_icap.service'
 }
 
 function update_netbox_lego()
