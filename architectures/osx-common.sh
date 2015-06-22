@@ -1,5 +1,5 @@
-# Switch to VI mode
-bindkey -v
+# VI Mode timeout
+export KEYTIMEOUT=1
 
 
 function boxen_edit()

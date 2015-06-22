@@ -71,9 +71,6 @@ export PYTHONPATH=$PYTHONPATH:'/Users/indika/dev/box/internal/nb-devtools/module
 
 alias ll="ls -la"
 
-#TODO: I can get rid of this now
-alias resource="source ~/.zshrc"
-
 
 
 clip () {
