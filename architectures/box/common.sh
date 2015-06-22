@@ -39,6 +39,9 @@ alias lync_beast_user2='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u testlyncus
 
 alias lync_beast_user3='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u testlyncuser3 -d labs.local -p Oxcoda99 10.12.11.186'
 
+alias lync_beast_mark='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u mark.jeffries -d labs.local -p oxcoda99 10.12.11.186'
+alias lync_beast_brett='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u brett.harvey -d labs.local -p oxcoda99 10.12.11.186'
+
 
 
 alias aim_win='rdesktop -g800x1000 -r clipboard:CLIPBOARD -u netboxblue -p oxcoda99 10.3.20.219'

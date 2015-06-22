@@ -78,6 +78,7 @@ alias yahoo='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/yahoo/messenger'
 alias linkedin='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/linkedin'
 alias twitter='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/twitter'
 alias aim='$CURRENT_PROJECT/nbwebscan/src/nbwebscan/aim'
+alias evernote='/Users/indika/dev/box/srm/srm/src/srm/evernote'
 
 
 
@@ -314,24 +315,80 @@ function lxml_sandbox()
 
 function srm_update()
 {
-    cd /Users/indika/dev/box/srm/srm/src/srm/facebook
-    aup srm recorder.py
-    aup srm graph.py
-    aup srm debugging.py
+    # cd /Users/indika/dev/box/srm/srm/src/srm/twitter
+    # cd /Users/indika/dev/box/srm/srm/src/srm/evernote
+    cd /Users/indika/dev/box/srm/srm/src
+    aup -r srm
+
     # hg baup 10.107.11.246 /Users/indika/dev/box/srm/srm/src/srm/facebook
     # aup 10.107.11.246 web.py
-    ss 10.107.11.246 'systemctl restart srmfacebook-web srmfacebook-recorder srmfacebook-poller'
-    date
+    ss srm 'systemctl restart srmtwitter-poller srmtwitter-web'
+    # ss srm 'systemctl restart srmtwitter-web'
+
+    # ss srm 'systemctl restart srmfacebook-poller.service srmfacebook-recorder.service srmfacebook-web.service'
+}
+
+function netcon_readonly()
+{
+    cd /Users/indika/dev/box/netbox/netcon/src/netcon/migration
+    aup -r lego .
+    ss lego 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
+}
+
+function netcon_init()
+{
+    sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt lego:.bashrc
+    aup -r lego /Users/indika/dev/box/netbox/netcon
+    aup -r lego /Users/indika/dev/box/netbox/hive
+    aup -r lego /Users/indika/dev/box/netbox/nbshared
+    aup -r lego /Users/indika/dev/box/netbox/py-nb
+    aup -r lego /Users/indika/dev/box/netbox/nbwebobj
+    ss lego 'systemctl enable hived.service; systemctl start hived.service'
+    ss lego 'journalctl -u hived.service'
+
+    # sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt motor:.bashrc
+    # aup -r motor /Users/indika/dev/box/netbox/netcon
+    # aup -r motor /Users/indika/dev/box/netbox/hive
+    # aup -r motor /Users/indika/dev/box/netbox/nbshared
+    # aup -r motor /Users/indika/dev/box/netbox/py-nb
+    # aup -r motor /Users/indika/dev/box/netbox/nbwebobj
+    # ss motor 'systemctl enable hived.service; systemctl start hived.service'
+    # ss motor 'journalctl -u hived.service'
+
+}
+
+function netcon_update()
+{
+    hg baup lego ~/dev/box/netbox -v
+    # hg baup motor ~/dev/box/netbox
+}
+
+
+function netcon_migrate()
+{
+    hg baup lego ~/dev/box/netbox
+    ss lego 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
+    ss lego 'curl localhost:60002/config/struss' | pbcopy
+
+
+    # hg baup motor ~/dev/box/netbox
+    # ss motor 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
+    # ss motor 'curl localhost:60002/config/funfour' | pbcopy
+
+    # ss lego 'curl localhost:8000/config/fooburn/default_route4'
 }
 
 
 function srm_test()
 {
-    cd /Users/indika/dev/box/srm/srm/src/srm/facebook
-    aup srm parsers.py -v
-    cd /Users/indika/dev/box/srm/srm/src/srm/facebook/test
-    aup -r srm /Users/indika/dev/box/srm/srm/src/srm/facebook/test -v
-    ss srm 'cd /usr/lib/python2.7/site-packages/srm/facebook/test; py.test -xvs .' 2>&1 | tee srm_test.log
+    # cd /Users/indika/dev/box/srm/srm/src/srm
+
+    cd /Users/indika/dev/box/srm/srm/src/srm/
+    aup -r srm .
+    # /usr/lib/python2.7/site-packages/srm/facebook/test
+    # ss srm 'cd /usr/lib/python2.7/site-packages/srm/evernote/test; py.test -xvs .' 2>&1 | tee test_read_evernote.py.log
+    # ss srm 'cd /usr/lib/python2.7/site-packages/srm/twitter/test; py.test -xvs .' 2>&1 | tee test_twitter.log
+    ss srm 'cd /usr/lib/python2.7/site-packages/srm/twitter/test; py.test -xvs test_read.py > out.log 2>&1 ; cat out.log' 2>&1 | tee test_twitter.log
 }
 
 
@@ -602,6 +659,22 @@ function test_on_lego()
     hg baup lego $CURRENT_PROJECT
     # hg baup 10.3.115.254 $CURRENT_PROJECT
     rununittest lego -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+    # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+
+    ag -B 1 -A 3 'indika' $1.log
+    ag -B 1 -A 3 'FAIL' $1.log
+    ag -B 1 -A 3 'passed' $1.log
+
+    printf "TESTING: %s" % $1
+}
+
+function test_on_srm()
+{
+
+    hg baup srm /Users/indika/dev/box/srm
+    # hg baup 10.3.115.254 $CURRENT_PROJECT
+    rununittest srm -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
+
     # rununittest 10.3.115.254 -n -t '-xvs --report=skipped' $1 2>&1 | tee $1.log
 
     ag -B 1 -A 3 'indika' $1.log
