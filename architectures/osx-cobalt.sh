@@ -116,6 +116,8 @@ function boxen_edit()
 
 # HD stuff
 
+export HD_LIBRARY='/Users/indika/dev/opensource/hist/library'
+
 function hd()
 {
     /Users/indika/dev/hd/dist/build/hd/hd
@@ -328,54 +330,64 @@ function srm_update()
     # ss srm 'systemctl restart srmfacebook-poller.service srmfacebook-recorder.service srmfacebook-web.service'
 }
 
-function netcon_readonly()
-{
-    cd /Users/indika/dev/box/netbox/netcon/src/netcon/migration
-    aup -r lego .
-    ss lego 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
-}
-
 function netcon_init()
 {
-    sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt lego:.bashrc
-    aup -r lego /Users/indika/dev/box/netbox/netcon
-    aup -r lego /Users/indika/dev/box/netbox/hive
-    aup -r lego /Users/indika/dev/box/netbox/nbshared
-    aup -r lego /Users/indika/dev/box/netbox/py-nb
-    aup -r lego /Users/indika/dev/box/netbox/nbwebobj
-    ss lego 'systemctl enable hived.service; systemctl start hived.service'
-    ss lego 'journalctl -u hived.service'
+    SITEKEY=lego
+    sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt $SITEKEY:.bashrc
+    aup -r $SITEKEY /Users/indika/dev/box/netbox/netcon
+    aup -r $SITEKEY /Users/indika/dev/box/netbox/hive
+    aup -r $SITEKEY /Users/indika/dev/box/netbox/nbshared
+    aup -r $SITEKEY /Users/indika/dev/box/netbox/py-nb
+    aup -r $SITEKEY /Users/indika/dev/box/netbox/nbwebobj
+    ss $SITEKEY 'systemctl enable hived.service; systemctl start hived.service'
+    ss $SITEKEY 'journalctl -u hived.service'
 
-    # sc /Users/indika/dev/box/docs/box.lego.bash_rc.txt motor:.bashrc
-    # aup -r motor /Users/indika/dev/box/netbox/netcon
-    # aup -r motor /Users/indika/dev/box/netbox/hive
-    # aup -r motor /Users/indika/dev/box/netbox/nbshared
-    # aup -r motor /Users/indika/dev/box/netbox/py-nb
-    # aup -r motor /Users/indika/dev/box/netbox/nbwebobj
-    # ss motor 'systemctl enable hived.service; systemctl start hived.service'
-    # ss motor 'journalctl -u hived.service'
 
+    sc /Users/indika/dev/box/netcon_dbs/netcon.db.date $SITEKEY:/etc/netcon
+    sc /Users/indika/dev/box/netcon_dbs/netcon.db.jsracs $SITEKEY:/etc/netcon
+    sc /Users/indika/dev/box/netcon_dbs/netcon.db.nbb-dev $SITEKEY:/etc/netcon
+    sc /Users/indika/dev/box/netcon_dbs/netcon.db.oxcoda $SITEKEY:/etc/netcon
+    sc /Users/indika/dev/box/netcon_dbs/netcon.db.thud $SITEKEY:/etc/netcon
 }
 
 function netcon_update()
 {
-    hg baup lego ~/dev/box/netbox -v
-    # hg baup motor ~/dev/box/netbox
+    SITEKEY=lego
+    cd ~/dev/box/netbox
+    hg baup $SITEKEY ~/dev/box/netbox -v
+    netcon_curl
+}
+
+function netcon_db_switch()
+{
+    SITEKEY=lego
+    ss $SITEKEY 'rm -f /etc/netcon/netcon.db; cp /etc/netcon/netcon.db.nbb-dev /etc/netcon/netcon.db'
 }
 
 
 function netcon_migrate()
 {
-    hg baup lego ~/dev/box/netbox
-    ss lego 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
-    ss lego 'curl localhost:60002/config/struss' | pbcopy
+    SITEKEY=lego
+    hg baup $SITEKEY ~/dev/box/netbox
+    ss $SITEKEY 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
+    ss $SITEKEY 'curl localhost:60002/config/netcon' | pbcopy
+    # ss lego 'curl localhost:60002/config/struss' | pbcopy
+}
 
+function netcon_curl()
+{
+    # curl 'http://lego.safenetbox.biz/net/local?oid=links%2F0;flav=local' -H 'Pragma: no-cache' -H 'Origin: http://lego.safenetbox.biz' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: en,en-US;q=0.8' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Cache-Control: no-cache' -H 'Referer: http://lego.safenetbox.biz/net/local?oid=links%2F0;flav=local' -H 'Cookie: session=iXwI7dM0TQqx9Y3oKEhUMjUwSq5NUARG3vMPhWGguLEdIPbOiYZje9BPtQ9zHWG/H1phS1/iaRRkUdkHw+spqUqDkM41tFxXwjglK+FivMUv1ltJHKo0P8oI3g1c+GcaCLtYLMhHmArfQ2vwcTDB6g==' -H 'Connection: keep-alive' --data '__formname__=link&oid=links%2F0&flav=local&dhcp_start=192.168.0.100&dhcp_end=192.168.0.200&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=10.233.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=Old+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=10.12.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=Current+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=10.201.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=Brand+New+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=10.203.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=New+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F4%5D=10.203.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F4%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F4%5D=New+NBB&%3D%3Dnetworks4%3Dip%5B___new___%5D=10.202.255.253&%3D%3Dnetworks4%3Dprefix%5B___new___%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B___new___%5D=New+YOYOMAMA+NBB&networks_update=Update&%3D%3Droutes4%3Dnetwork%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F1%5D=10.11.0.0&%3D%3Droutes4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F1%5D=255.255.0.0&%3D%3Droutes4%3Dvia%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F1%5D=10.12.255.253&%3D%3Droutes4%3Dmtu%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F1%5D=1500&%3D%3Droutes4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F1%5D=Additional+Gateway&%3D%3Droutes4%3Dnetwork%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=10.12.0.0&%3D%3Droutes4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=255.255.0.0&%3D%3Droutes4%3Dvia%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=10.12.255.253&%3D%3Droutes4%3Dmtu%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=1500&%3D%3Droutes4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=Another+Gateway&%3D%3Droutes4%3Dnetwork%5B___new___%5D=&%3D%3Droutes4%3Dprefix%5B___new___%5D=&%3D%3Droutes4%3Dvia%5B___new___%5D=&%3D%3Droutes4%3Dmtu%5B___new___%5D=1500&%3D%3Droutes4%3Dcomment%5B___new___%5D=' --compressed
 
-    # hg baup motor ~/dev/box/netbox
-    # ss motor 'cd /usr/lib/python2.7/site-packages/netcon/migration; python migrationtool.py'
-    # ss motor 'curl localhost:60002/config/funfour' | pbcopy
+    # A delete
+    curl 'http://lego.safenetbox.biz/net/local?oid=links%2F0;flav=local' -H 'Pragma: no-cache' -H 'Origin: http://lego.safenetbox.biz' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: en,en-US;q=0.8' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' -H 'Cache-Control: no-cache' -H 'Referer: http://lego.safenetbox.biz/net/local?oid=links%2F0;flav=local' -H 'Cookie: session=Z575hMH9Q+OYE0bLnCReIEnVJsfOO4mEawaQlqVJQvtV2Z0Quvoy1MdAR1g8XIlg2ug7u8P1ykokAS8llMGfGAmWjmYoevm22FmYbI0vQFQNy/CbgV90Av/HxKbkh4hTC2tA9Gz5sjGQVz+is+nHmA==' -H 'Connection: keep-alive' --data '__formname__=link&oid=links%2F0&flav=local&dhcp_start=192.168.0.100&dhcp_end=192.168.0.200&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=10.233.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F1%5D=Old+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=10.12.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F0%5D=Current+NBB&%3D%3Dnetworks4%3Ddel%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=on&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=10.201.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F3%5D=New+NEW+YO+YO+NBB&%3D%3Dnetworks4%3Dip%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=10.202.255.253&%3D%3Dnetworks4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=255.255.0.0&%3D%3Dnetworks4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_networks%2F2%5D=New+YOYOMAMA+NBB&%3D%3Dnetworks4%3Dip%5B___new___%5D=&%3D%3Dnetworks4%3Dprefix%5B___new___%5D=&%3D%3Dnetworks4%3Dcomment%5B___new___%5D=&networks_update=Update&%3D%3Droutes4%3Dnetwork%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=10.201.0.0&%3D%3Droutes4%3Dprefix%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=255.255.0.0&%3D%3Droutes4%3Dvia%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=10.201.255.253&%3D%3Droutes4%3Dmtu%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=1500&%3D%3Droutes4%3Dcomment%5B%2Fnetcon%2Fall_links%2F0%2Fipv4_routes%2F0%5D=ROUTING+ROUTING&%3D%3Droutes4%3Dnetwork%5B___new___%5D=&%3D%3Droutes4%3Dprefix%5B___new___%5D=&%3D%3Droutes4%3Dvia%5B___new___%5D=&%3D%3Droutes4%3Dmtu%5B___new___%5D=1500&%3D%3Droutes4%3Dcomment%5B___new___%5D=' --compressed
+}
 
-    # ss lego 'curl localhost:8000/config/fooburn/default_route4'
+function netcon_test_lite()
+{
+    SITEKEY=lego
+    hg baup $SITEKEY ~/dev/box/netbox
+    cd /Users/indika/dev/box/netbox/netcon/src/netcon/test
+    python test_migration.py
 }
 
 
