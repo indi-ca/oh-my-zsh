@@ -4,6 +4,7 @@
 
 # Imports
 source $ZSH/architectures/box/common.sh
+source $ZSH/architectures/boxen/common.sh
 
 
 alias ohmyzsh="st -n ~/.zshrc ~/.bashrc  ~/.oh-my-zsh ~/.oh-my-zsh/architectures/osx-wings.sh"
