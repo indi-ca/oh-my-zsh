@@ -86,7 +86,7 @@ alias evernote='/Users/indika/dev/box/srm/srm/src/srm/evernote'
 alias pass='pwgen -y 16'
 
 
-alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /Users/indika/dev/opensource/hist /Users/indika/.oh-my-zsh/architectures/osx-cobalt.sh'
+alias write='st -n /Users/indika/dev/config/sublime/projects/write.sublime-project'
 # alias write='st -n $CURRENT_PROJECT $CODE_LIBRARY /Users/indika/dev/box/docs /Users/indika/dev/box/helper /Users/indika/dev/functional /Users/indika/dev/opensource/synergy/src/lib/platform/OSXScreen.cpp /opt/boxen/repo/modules /opt/boxen/repo/manifests /Users/indika/.oh-my-zsh/architectures/osx-cobalt.sh'
 alias write_lync='st -n /Users/indika/dev/box/netbox/mslync /Users/indika/dev/deploy /Users/indika/dev/box/netbox/winripclient'
 
